@@ -183,13 +183,13 @@ function viewDashboard(){
       <td class="num">${r.weighted.toFixed(1)}</td>
       <td class="ctr">${badge(r.scoreGrade)}</td>
       <td class="ctr">${badge(r.finalGrade)}</td>
-      <td>${r.allFlags.length? r.allFlags.map(f=>`<span class="flag">${esc(f)}</span>`).join(' ') : '<span class="flag ok">없음</span>'}</td>
+      <td><div class="flaglist">${r.allFlags.length? r.allFlags.map(f=>`<span class="flag">${esc(f)}</span>`).join('') : '<span class="flag ok">없음</span>'}</div></td>
     </tr>`).join('');
   const table = list.length ? `<div class="panel"><h3>업체별 리스크 요약</h3>
-    <table><thead><tr>
+    <div class="table-wrap"><table><thead><tr>
       <th>업체</th><th class="ctr">국가</th><th class="num">Deposit</th><th class="ctr">커버율</th>
       <th class="num">가중점수</th><th class="ctr">점수등급</th><th class="ctr">최종 판정</th><th>레드플래그</th>
-    </tr></thead><tbody>${rows}</tbody></table></div>`
+    </tr></thead><tbody>${rows}</tbody></table></div></div>`
     : `<div class="panel"><div class="empty">등록된 업체가 없습니다. 우측 상단 <b>+ 신규 업체</b>로 시작하세요.</div></div>`;
   const guide = `<div class="panel"><h3>사용 순서</h3><div class="body" style="color:#54637a;font-size:13px;line-height:1.9">
     1) <b>신규 업체</b> 등록 → 기본정보·거래조건 입력 &nbsp;·&nbsp; 2) 제출서류·외부 공개정보 체크<br>
