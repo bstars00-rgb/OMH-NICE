@@ -22,7 +22,7 @@ const GRADE_META = {
   C:{label:'추가 확인 필요', cls:'g-C'}, D:{label:'보류', cls:'g-D'}, E:{label:'거절 추천', cls:'g-E'}
 };
 const RANK = {A:0,B:1,C:2,D:3,E:4};
-const STORE_KEY = 'omh_prg_v1';
+const STORE_KEY = 'omh_prg_v2';
 
 /* ---------- state ---------- */
 let DATA = load();
@@ -63,6 +63,7 @@ function blankCompany(){
     public:Object.fromEntries(PUBLIC_KEYS.map(k=>[k,'불명'])),
     scores:new Array(13).fill(3),
     notes:{expect:'', check:'', opinion:''},
+    documents:[],
     history:[]
   };
 }
@@ -71,6 +72,7 @@ function normalizeCompany(c){
   c.public = c.public || {}; PUBLIC_KEYS.forEach(k=>{ if(!(k in c.public)) c.public[k]='불명'; });
   if(!Array.isArray(c.scores)||c.scores.length!==13) c.scores=new Array(13).fill(3);
   c.notes = c.notes || {expect:'',check:'',opinion:''};
+  c.documents = c.documents || [];
   c.history = c.history || [];
   return c;
 }
@@ -304,6 +306,16 @@ function tabDeal(c){
   </div></div></div>`;
 }
 function tabDocs(c){
+  const fileRows = c.documents.length
+    ? c.documents.map(d=>`<a class="filecard" href="Document/${encodeURIComponent(d.file)}" target="_blank" rel="noopener">
+        <span class="fico">${/\.pdf$/i.test(d.file)?'PDF':/\.(jpg|jpeg|png)$/i.test(d.file)?'IMG':'FILE'}</span>
+        <span class="finfo"><b>${esc(d.name)}</b><span class="hint">${esc(d.file)}</span></span></a>`).join('')
+    : `<div class="hint" style="padding:6px 0">폴더에 업로드된 자료가 없습니다. <code>Document/</code> 폴더에 파일을 넣으면 여기에 표시됩니다.</div>`;
+  const folderPanel = `<div class="panel"><h3>폴더 제출 자료 <span class="pill">Document/ 기준</span></h3>
+    <div class="body">
+      <p class="hint" style="margin:0 0 12px">이 플랫폼은 <b>Document 폴더에 올린 파일</b>을 근거로 평가 결과를 표시합니다. 아래는 이 업체에 연결된 자료입니다(클릭 시 열림).</p>
+      <div class="filelist">${fileRows}</div>
+    </div></div>`;
   const docRows = DOC_KEYS.map(k=>`<div class="field"><label>${esc(k)}</label>
     <select data-doc="${esc(k)}">${opts(DOCV,c.docs[k])}</select></div>`).join('');
   const pubRows = PUBLIC_KEYS.map(k=>{
@@ -311,7 +323,7 @@ function tabDocs(c){
     return `<div class="field"><label>${esc(k)}${isNeg?' <span class="hint">(Y=위험)</span>':''}</label>
     <select data-public="${esc(k)}">${opts(YN,c.public[k])}</select></div>`; }).join('');
   const missing = DOC_KEYS.filter(k=>c.docs[k]==='미제출').length;
-  return `<div class="panel"><h3>03. 제출서류 <span class="pill">미제출 ${missing}건</span></h3>
+  return folderPanel + `<div class="panel"><h3>03. 제출서류 <span class="pill">미제출 ${missing}건</span></h3>
     <div class="body"><div class="form-grid three">${docRows}</div></div></div>
     <div class="panel"><h3>04. 외부 공개정보 체크</h3>
     <div class="body"><div class="form-grid three">${pubRows}</div>
@@ -533,17 +545,19 @@ function seed(){
       notes:{}, history:[], settlementDays:14, currency:'USD', creditRequired:'N',
       apiIntegration:'Y', manualBooking:'N', cancelNoshowRisk:'보통', status:'검토중' };
   }
-  const c1 = mk({ id:'C001', name:'Huamao', country:'중국', businessType:'B2B',
-    market:'중국 아웃바운드', customerType:'라이브커머스(샤오홍슈·더우인) 엔드유저',
-    website:'https://(확인필요)', bizRegNo:'확인필요', foundedYear:2021, representative:'확인필요',
-    contact:'', email:'', deposit:10000, monthlyGMV:50000, salesRegion:'태국·글로벌', products:'태국·글로벌 호텔',
-    scores:[3,4,5,5,4,4,4,3,2,3,3,2,4], status:'보류',
-    docs:{'사업자등록증':'미제출','회사소개서':'제출','은행정보':'제출','계약서 초안':'제출','정산조건 합의서':'미제출','파트너 레퍼런스':'제출','재무제표/매출자료':'미제출','대표자 신분확인':'미제출'},
-    public:{'공식 웹사이트':'Y','LinkedIn/기업프로필':'불명','Google 검색결과':'Y','부정 뉴스':'N','소송/사기/미정산':'N','거래처/업계 레퍼런스':'Y','도메인 생성시점':'불명','회사주소 실존':'Y','대표자 업계이력':'불명'},
-    notes:{expect:'샤오홍슈·더우인 라이브커머스 기반 4세대 구조 엔드유저 확보, 신규 채널 볼륨 기대',
-      check:'사업자등록증·재무제표 미제출, 사업자번호·대표자 확인 필요, Deposit 커버율 부족',
-      opinion:'엔드유저 매력도 높으나 실체·서류 미비로 현 상태 보류. 서류 보완 후 재평가 권고'},
-    history:[{stage:'영업 1차입력',reviewer:'Global OPs',decision:'보류',comment:'서류 미비·사업자 확인 필요',date:'2026-06-28'}] });
+  const c1 = mk({ id:'C001', name:'Huamao', country:'중국(홍콩법인)', businessType:'B2B',
+    market:'중국 아웃바운드', customerType:'라이브커머스(샤오홍슈·더우인) 엔드유저 + OTA·여행사',
+    website:'huamaoly@163.com (B2B 플랫폼 보유)', bizRegNo:'73809897-000-02-26-8 (HK BR) / 海南华茂 2019', foundedYear:2019, representative:'법인 등기 확인(대표자 성명 자료 추가 요청)',
+    contact:'Huamao', email:'huamaoly@163.com', deposit:10000, monthlyGMV:50000, salesRegion:'태국·글로벌', products:'태국·글로벌 호텔',
+    scores:[4,5,5,5,4,4,4,3,2,4,3,3,4], status:'검토중',
+    docs:{'사업자등록증':'제출','회사소개서':'제출','은행정보':'미제출','계약서 초안':'미제출','정산조건 합의서':'미제출','파트너 레퍼런스':'제출','재무제표/매출자료':'미제출','대표자 신분확인':'미제출'},
+    public:{'공식 웹사이트':'Y','LinkedIn/기업프로필':'불명','Google 검색결과':'Y','부정 뉴스':'N','소송/사기/미정산':'N','거래처/업계 레퍼런스':'Y','도메인 생성시점':'불명','회사주소 실존':'Y','대표자 업계이력':'Y'},
+    documents:[{name:'사업자등록증(홍콩 BR)',file:'huamao_business license 1.pdf'},{name:'회사소개서(15p)',file:'Huamao introduction file 1.pdf'}],
+    notes:{expect:'홍콩법인(HUAMAO TOURISM (HK) LTD)·하이난 본사(海南华茂, 2019 설립) 실체 확인. 자체 분산시스템·API 밀리초 응답, 직계약 2000+ 호텔·연 58만 룸나이트·600개 목적지. 샤오홍슈·더우인 라이브커머스 엔드유저 및 완다·비구이위안·폴리 등 부동산 정적요금 확보 — 신규 채널 볼륨 기대 큼.',
+      check:'은행정보·계약서·정산합의서·재무제표 미제출. 대표자 개인 성명/신분 자료 추가 필요. Deposit 커버율 0.43x로 예상 월거래액 대비 부족(상향 필요).',
+      opinion:'문서로 실체·사업모델·엔드유저 검증됨(기존 D-보류 → 상향). Deposit 상향 또는 초기 GMV 한도 설정 시 조건부 승인(B) 가능. 재무·은행 자료 보완 권고.'},
+    history:[{stage:'영업 1차입력',reviewer:'Global OPs',decision:'보류',comment:'서류 미비·사업자 확인 필요',date:'2026-06-28'},
+      {stage:'SCM/운영 검토',reviewer:'Global OPs',decision:'진행',comment:'폴더 자료 검토: HK BR·회사소개서 확인, 실체·엔드유저 검증 → 보류 해소',date:'2026-07-03'}] });
   const c2 = mk({ id:'C002', name:'Linkall Travel', country:'중국', businessType:'B2B',
     market:'중국 아웃바운드', customerType:'B2B 여행사(개발역량 강점)',
     website:'https://linkall.example', bizRegNo:'CN-3100-xxxxx', foundedYear:2019, representative:'확인 완료',
@@ -553,14 +567,19 @@ function seed(){
     notes:{expect:'개발역량 강점으로 API 안정 연동 기대',
       check:'기존 고객사와 채널 중복 가능성, Deposit 커버율 부족, 재무제표 미제출',
       opinion:'기술력은 양호하나 차별성·Deposit 보완 시 조건부 승인 검토 가능'} });
-  const c3 = mk({ id:'C003', name:'Wingplus', country:'중국', businessType:'B2B/TMC',
-    market:'중국 아웃바운드', customerType:'TMC 기업출장 엔드유저',
-    website:'https://wingplus.example', bizRegNo:'CN-4400-xxxxx', foundedYear:2020, representative:'확인 완료',
-    deposit:10000, monthlyGMV:40000, salesRegion:'글로벌·기업출장', products:'글로벌 호텔',
-    scores:[3,4,4,4,3,4,4,3,2,3,3,2,4],
-    notes:{expect:'TMC 기업출장 엔드유저 보유, 4세대 구조',
-      check:'Deposit 커버율 부족, 재무제표 미제출',
-      opinion:'엔드유저 보유 긍정적. Deposit 상향 또는 GMV 한도 설정 조건부 승인 검토'} });
+  const c3 = mk({ id:'C003', name:'Wingpulse (WINGSPULSE TECH)', country:'홍콩(중국계)', businessType:'B2B/TMC',
+    market:'LCC 항공+호텔 커넥티비티', customerType:'OTA·TMC·DMC (커넥티비티)',
+    website:'www.wingspulse.com / info@wingspulse.com', bizRegNo:'51588485 (HK BR)', foundedYear:2025, representative:'HE PENG(贺鹏), 단독이사',
+    contact:'WingsPulse', email:'info@wingspulse.com', deposit:10000, monthlyGMV:40000, salesRegion:'글로벌·기업출장', products:'글로벌 호텔·LCC 항공',
+    scores:[2,3,3,4,3,3,2,2,2,4,3,2,4], status:'검토중',
+    docs:{'사업자등록증':'제출','회사소개서':'제출','은행정보':'미제출','계약서 초안':'미제출','정산조건 합의서':'미제출','파트너 레퍼런스':'제출','재무제표/매출자료':'제출','대표자 신분확인':'미제출'},
+    public:{'공식 웹사이트':'Y','LinkedIn/기업프로필':'불명','Google 검색결과':'Y','부정 뉴스':'N','소송/사기/미정산':'N','거래처/업계 레퍼런스':'Y','도메인 생성시점':'불명','회사주소 실존':'Y','대표자 업계이력':'Y'},
+    documents:[{name:'사업자등록·감사 재무제표(17p)',file:'Business license wingpulse 1.pdf'},{name:'회사소개서(영문)',file:'Wing pulse intro-English 1.jpg'}],
+    notes:{expect:'LCC 항공 데이터 애그리게이션(전신 Alfa Aggregators) 기반 기술력, NDC·100+ 항공사, 호텔 분산 기술 dual-track. OTA·TMC·DMC 대상 커넥티비티 — 기술 잠재력은 높음.',
+      check:'★감사 재무제표상 해당연도 무영업(inactive)·매출 0, 2025.5 사명 변경(ALFA AGGREGATORS→WINGSPULSE), 자산 대부분이 이사·주주 대여금(HE PENG 등). 실거래 실적·운영 증빙 부재. Deposit 커버율 0.54x 부족.',
+      opinion:'법인·감사보고서는 투명하나 실질 영업 실적이 없는 신설 리브랜드 법인 → 현 단계 보류(D). 선입금/Deposit 대폭 상향 및 실거래 파일럿·매출 증빙 확인 후 재평가 권고.'},
+    history:[{stage:'영업 1차입력',reviewer:'Global OPs',decision:'진행',comment:'TMC/커넥티비티 기술 파트너 후보',date:'2026-06-27'},
+      {stage:'재무 정산검토',reviewer:'Global OPs',decision:'보류',comment:'폴더 자료 검토: 감사보고서상 무영업·매출0, 사명변경 → 실적 증빙까지 보류',date:'2026-07-03'}] });
   const c4 = mk({ id:'C004', name:'Happy Travel', country:'두바이(UAE)', businessType:'B2B/TMC',
     market:'중동', customerType:'중동 기업/여행사(태국 호텔 수요)',
     website:'https://happytravel.example', bizRegNo:'AE-DXB-xxxxx', foundedYear:2018, representative:'확인 완료',

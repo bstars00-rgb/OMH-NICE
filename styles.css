@@ -113,6 +113,12 @@ td.ctr,th.ctr{text-align:center}
 .flaglist{display:flex;flex-wrap:wrap;gap:4px;max-width:280px}
 .flaglist .flag{font-size:11px;padding:2px 7px;white-space:nowrap}
 .table-wrap{width:100%;overflow-x:auto}
+.filelist{display:flex;flex-wrap:wrap;gap:10px}
+.filecard{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:#fbfcfe;min-width:240px;color:var(--text)}
+.filecard:hover{background:#f0f5fb;border-color:var(--primary-2)}
+.filecard .fico{font-size:10px;font-weight:800;color:#fff;background:var(--primary-2);border-radius:6px;padding:6px 7px;letter-spacing:.5px}
+.filecard .finfo{display:flex;flex-direction:column;line-height:1.35}
+.filecard .finfo b{font-size:13px}
 
 /* report */
 .report{background:#fff;border:1px solid var(--line);border-radius:10px;padding:30px 34px;max-width:820px;margin:0 auto;box-shadow:var(--shadow)}
