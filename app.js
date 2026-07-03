@@ -187,11 +187,12 @@ function viewDashboard(){
       <td class="ctr">${badge(r.scoreGrade)}</td>
       <td class="ctr">${badge(r.finalGrade)}</td>
       <td><div class="flaglist">${r.allFlags.length? r.allFlags.map(f=>`<span class="flag">${esc(f)}</span>`).join('') : '<span class="flag ok">없음</span>'}</div></td>
+      <td><div class="comment-cell"><span class="cscore">${esc(c.scores[13])}/5</span> ${esc(c.notes.comment||'-')}</div></td>
     </tr>`).join('');
   const table = list.length ? `<div class="panel"><h3>업체별 리스크 요약</h3>
     <div class="table-wrap"><table><thead><tr>
       <th>업체</th><th class="ctr">국가</th><th class="num">Deposit</th><th class="ctr">커버율</th>
-      <th class="num">가중점수</th><th class="ctr">점수등급<br><span class="hint" style="font-weight:400">(참고)</span></th><th class="ctr">최종 판정<br><span class="hint" style="font-weight:400">(레드플래그 반영)</span></th><th>레드플래그</th>
+      <th class="num">가중점수</th><th class="ctr">점수등급<br><span class="hint" style="font-weight:400">(참고)</span></th><th class="ctr">최종 판정<br><span class="hint" style="font-weight:400">(레드플래그 반영)</span></th><th>레드플래그</th><th>담당자 코멘트<br><span class="hint" style="font-weight:400">(점수/5)</span></th>
     </tr></thead><tbody>${rows}</tbody></table></div></div>`
     : `<div class="panel"><div class="empty">등록된 업체가 없습니다.</div></div>`;
   const guide = `<div class="panel"><h3>사용 순서</h3><div class="body" style="color:#54637a;font-size:13px;line-height:1.9">

@@ -113,6 +113,8 @@ td.ctr,th.ctr{text-align:center}
 .flaglist{display:flex;flex-wrap:wrap;gap:4px;max-width:280px}
 .flaglist .flag{font-size:11px;padding:2px 7px;white-space:nowrap}
 .table-wrap{width:100%;overflow-x:auto}
+.comment-cell{max-width:300px;min-width:200px;font-size:12px;color:#54637a;line-height:1.45;white-space:normal}
+.cscore{display:inline-block;background:var(--primary-2);color:#fff;border-radius:6px;padding:1px 7px;font-size:11px;font-weight:700;margin-right:4px}
 .filelist{display:flex;flex-wrap:wrap;gap:10px}
 .filecard{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:#fbfcfe;min-width:240px;color:var(--text)}
 .filecard:hover{background:#f0f5fb;border-color:var(--primary-2)}
