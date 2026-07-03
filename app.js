@@ -23,7 +23,7 @@ const GRADE_META = {
   C:{label:'추가 확인 필요', cls:'g-C'}, D:{label:'보류', cls:'g-D'}, E:{label:'거절 추천', cls:'g-E'}
 };
 const RANK = {A:0,B:1,C:2,D:3,E:4};
-const STORE_KEY = 'omh_prg_v6';
+const STORE_KEY = 'omh_prg_v7';
 
 /* ---------- state ---------- */
 let DATA = load();
@@ -641,7 +641,19 @@ function seed(){
       {stage:'영업 1차입력',reviewer:'Global OPs',decision:'진행',comment:'중동 태국호텔 볼륨 목적, Deposit 30k',date:'2026-06-25'},
       {stage:'SCM/운영 검토',reviewer:'SCM팀',decision:'진행',comment:'엔드유저·인벤토리 적정',date:'2026-06-27'},
       {stage:'재무 정산검토',reviewer:'재무팀',decision:'진행',comment:'커버율 1.07x, GMV 한도 조건',date:'2026-06-29'}] });
-  return [c1,c2,c3,c4];
+  const c5 = mk({ id:'C005', name:'Ohmyhotel (오마이호텔앤코) · 자체평가', country:'싱가포르 본사(한·일·베 법인)', businessType:'B2B/B2C/SaaS',
+    market:'아시아(한·일·베·태)+글로벌', customerType:'B2B 파트너 + B2C(ohmyhotel.com) 엔드유저',
+    website:'ohmyhotel.com / ohmyhotel.biz', bizRegNo:'주식회사 오마이호텔앤코 (2012 설립 · DART/나이스 조회)', foundedYear:2012, representative:'이미순 대표(前 Vicotrip)',
+    contact:'Global OPs', email:'Global_OPs@ohmyhotel.com', deposit:0, settlementDays:0, currency:'KRW', creditRequired:'N', monthlyGMV:0, salesRegion:'아시아·글로벌', products:'일·베·태·한 호텔 3,700+ 직계약', apiIntegration:'Y', manualBooking:'N', cancelNoshowRisk:'낮음',
+    scores:[5,5,5,4,5,5,5,4,4,5,4,4,5,5], status:'승인',
+    docs:{'사업자등록증':'제출','회사소개서':'제출','은행정보':'제출','계약서 초안':'제출','정산조건 합의서':'제출','파트너 레퍼런스':'제출','재무제표/매출자료':'미제출','대표자 신분확인':'제출'},
+    public:{'공식 웹사이트':'Y','LinkedIn/기업프로필':'Y','Google 검색결과':'Y','부정 뉴스':'N','소송/사기/미정산':'N','거래처/업계 레퍼런스':'Y','도메인 생성시점':'Y','회사주소 실존':'Y','대표자 업계이력':'Y'},
+    notes:{expect:'2012 설립, 싱가포르 본사·한/일/베 법인, 100+ 임직원. B2B(ohmyhotel.biz, 2023 오픈)·B2C(ohmyhotel.com)·OHMY SaaS 올인원 플랫폼. 아시아 3,700+ 직계약 호텔(일·베·태·한). 2024 관광진흥 국무총리상·외화 3천만 USD 유치탑, 2025 한국관광공사 글로벌챌린지 선정.',
+      check:'자체 평가 — Deposit·정산주기 항목은 플랫폼 특성상 해당 없음(0 표기). 감사 재무제표·투자단계는 DART/나이스 조회 필요. Jobplanet 평점 2.8(내부 문화 참고).',
+      opinion:'설립 이력·다국적 법인·직계약 인벤토리·수상 실적으로 신뢰도 최상위 → 프레임 기준 A(승인추천). 신규 파트너 평가의 벤치마크(기준선)로 활용.',
+      comment:'우리 회사 자체 벤치마크. 실체·사업모델·인벤토리·성장성 최상위(5/5). Deposit/정산은 플랫폼 특성상 해당 없음.'},
+    documents:[] });
+  return [c1,c2,c3,c4,c5];
 }
 
 /* ---------- boot ---------- */
