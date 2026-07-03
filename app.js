@@ -23,7 +23,7 @@ const GRADE_META = {
   C:{label:'추가 확인 필요', cls:'g-C'}, D:{label:'보류', cls:'g-D'}, E:{label:'거절 추천', cls:'g-E'}
 };
 const RANK = {A:0,B:1,C:2,D:3,E:4};
-const STORE_KEY = 'omh_prg_v4';
+const STORE_KEY = 'omh_prg_v5';
 
 /* ---------- state ---------- */
 let DATA = load();
@@ -63,7 +63,7 @@ function blankCompany(){
     docs:Object.fromEntries(DOC_KEYS.map(k=>[k,'미제출'])),
     public:Object.fromEntries(PUBLIC_KEYS.map(k=>[k,'불명'])),
     scores:new Array(ITEM_NAMES.length).fill(3),
-    notes:{expect:'', check:'', opinion:''},
+    notes:{expect:'', check:'', opinion:'', comment:''},
     documents:[],
     history:[]
   };
@@ -74,7 +74,8 @@ function normalizeCompany(c){
   if(!Array.isArray(c.scores)) c.scores=[];
   while(c.scores.length < ITEM_NAMES.length) c.scores.push(3);
   if(c.scores.length > ITEM_NAMES.length) c.scores = c.scores.slice(0, ITEM_NAMES.length);
-  c.notes = c.notes || {expect:'',check:'',opinion:''};
+  c.notes = c.notes || {};
+  ['expect','check','opinion','comment'].forEach(function(k){ if(!(k in c.notes)) c.notes[k]=''; });
   c.documents = c.documents || [];
   c.history = c.history || [];
   return c;
@@ -341,6 +342,7 @@ function tabRisk(c,r){
     <div class="body">${rows}</div></div>
     <div class="panel" id="risk-result"><h3>평가 결과</h3><div class="body">${riskResultHTML(r)}</div></div>
     <div class="panel"><h3>보고용 코멘트</h3><div class="body"><div class="form-grid">
+      <div class="field full"><label>담당자 코멘트 <span class="hint">(담당자 코멘트 점수의 근거·종합 소견)</span></label><textarea data-note="comment">${esc(c.notes.comment)}</textarea></div>
       <div class="field full"><label>기대효과</label><textarea data-note="expect">${esc(c.notes.expect)}</textarea></div>
       <div class="field full"><label>주요 리스크 / 확인 필요사항</label><textarea data-note="check">${esc(c.notes.check)}</textarea></div>
       <div class="field full"><label>종합 의견</label><textarea data-note="opinion">${esc(c.notes.opinion)}</textarea></div>
@@ -384,6 +386,7 @@ function tabReport(c,r){
       <div class="sec">기대효과</div><div>${esc(c.notes.expect||'-')}</div>
       <div class="sec">주요 리스크 / 확인 필요사항</div><div>${esc(c.notes.check||'-')}</div>
       <div class="sec">종합 의견</div><div>${esc(c.notes.opinion||'-')}</div>
+      <div class="sec">담당자 코멘트 <span class="hint" style="font-weight:400">(담당자 코멘트 점수 ${esc(c.scores[13])}/5)</span></div><div>${esc(c.notes.comment||'-')}</div>
       <div class="decision">
         <b>승인 요청 조건</b><br>
         □ Deposit 상향 (USD ___ → ___) &nbsp; □ 정산주기 단축 (___일)<br>
@@ -515,7 +518,8 @@ Deposit: ${fmtUSD(c.deposit)}
 레드플래그: ${r.allFlags.length?r.allFlags.join(', '):'없음'}
 기대효과: ${c.notes.expect}
 리스크/확인 필요: ${c.notes.check}
-종합 의견: ${c.notes.opinion}`;
+종합 의견: ${c.notes.opinion}
+담당자 코멘트(점수 ${c.scores[13]}/5): ${c.notes.comment}`;
   navigator.clipboard.writeText(txt).then(()=>alert('승인 요청서가 클립보드에 복사되었습니다.'),
     ()=>alert('복사 실패 — 브라우저 권한을 확인하세요.'));
 }
@@ -555,7 +559,8 @@ function seed(){
     documents:[{name:'사업자등록증(홍콩 BR)',file:'huamao_business license 1.pdf'},{name:'회사소개서(15p)',file:'Huamao introduction file 1.pdf'}],
     notes:{expect:'홍콩법인·하이난 본사(2019 설립) 실체 확인. 60만 호텔·직계약 2000+·연 58만 RN. B2B 주력이며 B2C 플랫폼(sub-agent)도 운영. 일본·한국·베트남은 일 100~200 RN 예측. 샤오홍슈·더우인 라이브커머스·숏폼 판매, 공급사 Hotelbeds·WebBeds·Expedia·Trip.com·Rakuten·Restel·Fliggy·Meituan 등 광범위.',
       check:'은행정보·계약서·정산합의서·재무제표 미제출. 대표자 개인 성명/신분 자료 추가 필요. Deposit 커버율 0.43x로 예상 월거래액 대비 부족(상향 필요).',
-      opinion:'실체·사업모델·엔드유저·공급망 검증됨(기존 D-보류 → 상향). Deposit 상향 또는 초기 GMV 한도(예: JP/KR/VN 일 100~200 RN) 설정 시 조건부 승인(B) 가능. 재무·은행 자료 보완 권고.'},
+      opinion:'실체·사업모델·엔드유저·공급망 검증됨(기존 D-보류 → 상향). Deposit 상향 또는 초기 GMV 한도(예: JP/KR/VN 일 100~200 RN) 설정 시 조건부 승인(B) 가능. 재무·은행 자료 보완 권고.',
+      comment:'실체·공급망 검증 완료로 신뢰도 높게 봄(4/5). Deposit 커버율만 보완되면 승인 추천 가능. 초기 JP/KR/VN RN 한도부터 시작 권장.'},
     history:[{stage:'영업 1차입력',reviewer:'Global OPs',decision:'보류',comment:'서류 미비·사업자 확인 필요',date:'2026-06-28'},
       {stage:'SCM/운영 검토',reviewer:'Global OPs',decision:'진행',comment:'폴더 자료 검토: HK BR·회사소개서 확인, 실체·엔드유저 검증 → 보류 해소',date:'2026-07-03'}] });
   const c2 = mk({ id:'C002', name:'Linkall Travel', country:'중국', businessType:'B2B',
@@ -566,7 +571,8 @@ function seed(){
     docs:{'사업자등록증':'제출','회사소개서':'제출','은행정보':'제출','계약서 초안':'제출','정산조건 합의서':'미제출','파트너 레퍼런스':'제출','재무제표/매출자료':'미제출','대표자 신분확인':'제출'},
     notes:{expect:'대표 개발자 출신으로 기술력 강함(연동 2~3일 가능). 일 5,000~6,000건 예약(일본 ~30%), 유럽·일본·태국 주력. 24/7 CS 운영.',
       check:'공급사가 Expedia·Hotelbeds·WebBeds 등 대형 애그리게이터 중심 → 유니크 인벤토리·기존 채널 중복도 확인 필요. 사업자등록·재무제표 등 서류 미제출. Deposit 커버율 0.71x 부족.',
-      opinion:'거래량·기술력은 매력적이나 인벤토리 차별성이 낮고 Deposit 부족 → 추가 확인. 서류 징구·Deposit 상향·유니크 요금 확인 시 조건부 승인 가능.'} });
+      opinion:'거래량·기술력은 매력적이나 인벤토리 차별성이 낮고 Deposit 부족 → 추가 확인. 서류 징구·Deposit 상향·유니크 요금 확인 시 조건부 승인 가능.',
+      comment:'일 5~6천 예약·빠른 연동은 큰 강점(4/5). 다만 대형 애그리게이터 리셀이라 우리 인벤토리와 중복 우려 → 유니크 요금·서류 확인이 승인 전제.'} });
   const c3 = mk({ id:'C003', name:'Wingpulse (WINGSPULSE TECH)', country:'홍콩(중국계)', businessType:'B2B/TMC',
     market:'호텔 직계약+LCC 항공 (Travel Tech)', customerType:'DMC·여행사·OTA·TMC',
     website:'www.wingspulse.com / info@wingspulse.com', bizRegNo:'51588485 (HK BR)', foundedYear:2025, representative:'HE PENG(贺鹏), 단독이사',
@@ -577,7 +583,8 @@ function seed(){
     documents:[{name:'사업자등록·감사 재무제표(17p)',file:'Business license wingpulse 1.pdf'},{name:'회사소개서(영문)',file:'Wing pulse intro-English 1.jpg'}],
     notes:{expect:'AI·시맨틱 태깅 기반 데이터 정확성·거래효율 중심 Travel Tech(홍콩·선전 거점). 동남아·한국·중국(홍콩·대만·마카오) 직계약 호텔 260+ 및 현지 DMC 협력, LCC 항공(NDC·100+ 항공사) dual-track. 밀리초 API·실시간 재고.',
       check:'★회사 제공 정보상 260+ 직계약·운영 거점이 있으나, 제출된 감사 재무제표(2026.3)는 무영업(inactive)·매출 0으로 상충. 2025.5 사명 변경(ALFA→WINGSPULSE), 자산 대부분 이사·주주 대여금. 실거래·매출 증빙 필수. Deposit 커버율 0.54x 부족.',
-      opinion:'기술력·직계약 인벤토리는 긍정적이나 감사보고서상 실적 부재가 핵심 리스크 → 추가 확인(기존 보류 → 상향). 실거래 파일럿·매출 증빙 및 Deposit 상향 확인 시 조건부 승인 검토.'},
+      opinion:'기술력·직계약 인벤토리는 긍정적이나 감사보고서상 실적 부재가 핵심 리스크 → 추가 확인(기존 보류 → 상향). 실거래 파일럿·매출 증빙 및 Deposit 상향 확인 시 조건부 승인 검토.',
+      comment:'기술·260 직계약은 인상적이나 감사상 무영업이 마음에 걸려 신중(3/5). 소규모 실거래 파일럿으로 매출·정산 실적부터 확인 후 확대 권장.'},
     history:[{stage:'영업 1차입력',reviewer:'Global OPs',decision:'진행',comment:'TMC/커넥티비티 기술 파트너 후보',date:'2026-06-27'},
       {stage:'재무 정산검토',reviewer:'Global OPs',decision:'보류',comment:'폴더 자료 검토: 감사보고서상 무영업·매출0, 사명변경 → 실적 증빙까지 보류',date:'2026-07-03'},
       {stage:'SCM/운영 검토',reviewer:'Global OPs',decision:'진행',comment:'추가정보(260+ 직계약·DMC 협력) 반영해 상향, 단 감사상 무영업과 상충 → 실거래 증빙 조건 추가확인',date:'2026-07-03'}] });
@@ -588,7 +595,8 @@ function seed(){
     scores:[4,4,4,4,4,3,5,4,3,3,3,3,4,4],
     notes:{expect:'중동 고객사 통한 태국 호텔 볼륨 증가 기대, Deposit USD 30,000로 상대적 견고',
       check:'수기예약 비중·중동 정산/법무 리스크 확인 필요',
-      opinion:'종합 리스크 낮음. 초기 3개월 GMV 한도·모니터링 조건부 승인 추천'},
+      opinion:'종합 리스크 낮음. 초기 3개월 GMV 한도·모니터링 조건부 승인 추천',
+      comment:'Deposit 30k로 커버율 견고, 태국 볼륨 목적 명확(4/5). 초기 3개월 모니터링 조건으로 승인 추천.'},
     history:[
       {stage:'영업 1차입력',reviewer:'Global OPs',decision:'진행',comment:'중동 태국호텔 볼륨 목적, Deposit 30k',date:'2026-06-25'},
       {stage:'SCM/운영 검토',reviewer:'SCM팀',decision:'진행',comment:'엔드유저·인벤토리 적정',date:'2026-06-27'},
