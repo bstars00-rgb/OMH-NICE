@@ -189,7 +189,7 @@ function viewDashboard(){
       <td><div class="flaglist">${r.allFlags.length? r.allFlags.map(f=>`<span class="flag">${esc(f)}</span>`).join('') : '<span class="flag ok">없음</span>'}</div></td>
       <td><div class="comment-cell"><span class="cscore">${esc(c.scores[13])}/5</span> ${esc(c.notes.comment||'-')}</div></td>
     </tr>`).join('');
-  const table = list.length ? `<div class="panel"><h3 style="display:flex;align-items:center;justify-content:space-between;gap:12px">업체별 리스크 요약 <button class="btn sm" data-act="copysummary">📋 표 복사</button></h3>
+  const table = list.length ? `<div class="panel"><h3 style="display:flex;align-items:center;justify-content:space-between;gap:12px">업체별 리스크 요약 <button class="btn sm" data-act="copysummary">📋 서식 복사</button></h3>
     <div class="table-wrap"><table><thead><tr>
       <th>업체</th><th class="ctr">국가</th><th class="num">Deposit</th><th class="ctr">커버율</th>
       <th class="num">가중점수</th><th class="ctr">점수등급<br><span class="hint" style="font-weight:400">(참고)</span></th><th class="ctr">최종 판정<br><span class="hint" style="font-weight:400">(레드플래그 반영)</span></th><th>레드플래그</th><th>담당자 코멘트<br><span class="hint" style="font-weight:400">(점수/5)</span></th>
@@ -518,26 +518,63 @@ function fallbackCopy(text, okMsg){
   alert(ok ? (okMsg||'복사되었습니다.') : '복사 실패 — 표를 직접 선택해 복사하세요.');
 }
 
-/* ---------- summary table copy (TSV) ---------- */
+/* ---------- rich (formatted) clipboard ---------- */
+function gradeColor(g){ return {A:'#1e9e57',B:'#3aa6a0',C:'#e0a400',D:'#e6791f',E:'#d63b3b'}[g]||'#888'; }
+function copyRich(html, text, okMsg){
+  if(navigator.clipboard && window.ClipboardItem && window.isSecureContext){
+    try{
+      const item = new ClipboardItem({
+        'text/html': new Blob([html], {type:'text/html'}),
+        'text/plain': new Blob([text], {type:'text/plain'})
+      });
+      navigator.clipboard.write([item]).then(()=>alert(okMsg), ()=>fallbackRich(html, text, okMsg));
+      return;
+    }catch(e){}
+  }
+  fallbackRich(html, text, okMsg);
+}
+function fallbackRich(html, text, okMsg){
+  const div=document.createElement('div');
+  div.contentEditable='true'; div.innerHTML=html;
+  div.style.position='fixed'; div.style.top='-1000px'; div.style.opacity='0';
+  document.body.appendChild(div);
+  const range=document.createRange(); range.selectNodeContents(div);
+  const sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+  let ok=false; try{ ok=document.execCommand('copy'); }catch(e){}
+  sel.removeAllRanges(); document.body.removeChild(div);
+  alert(ok ? okMsg : '복사 실패 — 표를 직접 선택해 복사하세요.');
+}
+
+/* ---------- summary table copy (formatted HTML + TSV) ---------- */
 function copySummary(){
   const clean = s => String(s==null?'':s).replace(/[\t\r\n]+/g,' ').trim();
-  const cols = ['업체ID','업체명','국가','사업유형','Deposit(USD)','커버율','가중점수','점수등급','최종판정','레드플래그','담당자코멘트점수','담당자코멘트'];
-  const lines = [cols.join('\t')];
+  const cols = ['업체','국가','Deposit(USD)','커버율','가중점수','점수등급','최종판정','레드플래그','담당자 코멘트(점수)'];
+  const th = c => `<th style="border:1px solid #b9c2d0;padding:7px 10px;background:#1F4E78;color:#fff;text-align:left;white-space:nowrap">${c}</th>`;
+  const td = (c,extra) => `<td style="border:1px solid #d6dce6;padding:6px 10px;vertical-align:top;${extra||''}">${c}</td>`;
+  const badge = g => `<span style="display:inline-block;background:${gradeColor(g)};color:#fff;padding:2px 8px;border-radius:10px;font-weight:700;font-size:11px;white-space:nowrap">${g}·${GRADE_META[g].label}</span>`;
+  let html = `<table style="border-collapse:collapse;font-family:'Malgun Gothic',Arial,sans-serif;font-size:12px;color:#1e2632"><thead><tr>${cols.map(th).join('')}</tr></thead><tbody>`;
+  const tlines = [cols.join('\t')];
   DATA.companies.forEach(c=>{
     const r = compute(c);
-    lines.push([
-      c.id, c.name, c.country, c.businessType,
-      Number(c.deposit)||0,
-      r.coverage==null?'-':r.coverage.toFixed(2)+'x',
-      r.weighted.toFixed(1),
-      r.scoreGrade,
-      r.finalGrade+'-'+GRADE_META[r.finalGrade].label,
-      r.allFlags.length? r.allFlags.join('; '):'없음',
-      c.scores[13],
-      c.notes.comment||''
-    ].map(clean).join('\t'));
+    const cov = r.coverage==null?'—':r.coverage.toFixed(2)+'x';
+    const flags = r.allFlags.length? r.allFlags.join('; '):'없음';
+    const dep = '$'+(Number(c.deposit)||0).toLocaleString('en-US');
+    html += '<tr>'+
+      td('<b>'+esc(c.name)+'</b><br><span style="color:#7a869a">'+esc(c.id)+' · '+esc(c.businessType)+'</span>')+
+      td(esc(c.country),'white-space:nowrap')+
+      td(dep,'text-align:right;white-space:nowrap')+
+      td(cov,'text-align:center;white-space:nowrap')+
+      td(r.weighted.toFixed(1),'text-align:right')+
+      td(badge(r.scoreGrade),'text-align:center')+
+      td(badge(r.finalGrade),'text-align:center')+
+      td(esc(flags),'color:#b23b3b')+
+      td('<b>'+esc(c.scores[13])+'/5</b> '+esc(c.notes.comment||''),'min-width:260px;color:#54637a')+
+      '</tr>';
+    tlines.push([c.name+' ('+c.id+')', c.country, dep, cov, r.weighted.toFixed(1), r.scoreGrade,
+      r.finalGrade+'-'+GRADE_META[r.finalGrade].label, flags, '('+c.scores[13]+'/5) '+(c.notes.comment||'')].map(clean).join('\t'));
   });
-  copyText(lines.join('\n'), DATA.companies.length+'개 업체 리스크 요약이 복사되었습니다. Excel·메일·Word에 붙여넣기 하세요(탭 구분).');
+  html += '</tbody></table>';
+  copyRich(html, tlines.join('\n'), DATA.companies.length+'개 업체 리스크 요약이 서식 포함으로 복사되었습니다. 메일·Word·Excel에 붙여넣기 하세요.');
 }
 
 /* ---------- report copy ---------- */
