@@ -145,14 +145,8 @@ function render(){
   document.getElementById('page-sub').textContent = sub;
 
   const acts = document.getElementById('top-actions');
-  if(VIEW==='dashboard'||VIEW==='companies'){
-    acts.innerHTML = `<button class="btn" data-act="export">JSON 내보내기</button>
-      <button class="btn" data-act="import">가져오기</button>
-      <button class="btn ghost" data-act="reset">예시 초기화</button>
-      <button class="btn primary" data-act="add">+ 신규 업체</button>`;
-  } else if(VIEW==='company'){
-    acts.innerHTML = `<button class="btn" data-act="back">← 목록</button>
-      <button class="btn danger sm" data-act="delete">업체 삭제</button>`;
+  if(VIEW==='company'){
+    acts.innerHTML = `<button class="btn" data-act="back">← 목록</button>`;
   } else acts.innerHTML = '';
 
   const el = document.getElementById('content');
@@ -193,10 +187,10 @@ function viewDashboard(){
       <th>업체</th><th class="ctr">국가</th><th class="num">Deposit</th><th class="ctr">커버율</th>
       <th class="num">가중점수</th><th class="ctr">점수등급<br><span class="hint" style="font-weight:400">(참고)</span></th><th class="ctr">최종 판정<br><span class="hint" style="font-weight:400">(레드플래그 반영)</span></th><th>레드플래그</th>
     </tr></thead><tbody>${rows}</tbody></table></div></div>`
-    : `<div class="panel"><div class="empty">등록된 업체가 없습니다. 우측 상단 <b>+ 신규 업체</b>로 시작하세요.</div></div>`;
+    : `<div class="panel"><div class="empty">등록된 업체가 없습니다.</div></div>`;
   const guide = `<div class="panel"><h3>사용 순서</h3><div class="body" style="color:#54637a;font-size:13px;line-height:1.9">
-    1) <b>신규 업체</b> 등록 → 기본정보·거래조건 입력 &nbsp;·&nbsp; 2) 제출서류·외부 공개정보 체크<br>
-    3) <b>리스크 평가</b>에서 13개 항목 1~5점 → 가중점수·최종판정 자동 &nbsp;·&nbsp; 4) <b>승인 요청서</b> 자동 생성·인쇄<br>
+    1) <b>Document 폴더</b>에 업체 자료(사업자등록·회사소개서 등) 업로드 &nbsp;·&nbsp; 2) 담당자가 <b>리스크 평가</b> 13개 항목 입력<br>
+    3) 가중점수·최종판정 <b>자동 산출</b> &nbsp;·&nbsp; 4) <b>승인 요청서</b> 자동 생성·인쇄로 대표이사 보고<br>
     ※ 최종판정 = min(점수등급, 레드플래그 상한). 사업자·실체 확인불가/부정뉴스/소송 등은 자동 <b>D-보류</b>.
   </div></div>`;
   return cards + table + guide;
