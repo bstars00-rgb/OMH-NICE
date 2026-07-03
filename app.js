@@ -23,7 +23,7 @@ const GRADE_META = {
   C:{label:'추가 확인 필요', cls:'g-C'}, D:{label:'보류', cls:'g-D'}, E:{label:'거절 추천', cls:'g-E'}
 };
 const RANK = {A:0,B:1,C:2,D:3,E:4};
-const STORE_KEY = 'omh_prg_v3';
+const STORE_KEY = 'omh_prg_v4';
 
 /* ---------- state ---------- */
 let DATA = load();
@@ -546,40 +546,41 @@ function seed(){
       apiIntegration:'Y', manualBooking:'N', cancelNoshowRisk:'보통', status:'검토중' };
   }
   const c1 = mk({ id:'C001', name:'Huamao', country:'중국(홍콩법인)', businessType:'B2B',
-    market:'중국 아웃바운드', customerType:'라이브커머스(샤오홍슈·더우인) 엔드유저 + OTA·여행사',
+    market:'중국 아웃바운드', customerType:'라이브커머스(샤오홍슈·더우인)·OTA·여행사 + B2C sub-agent',
     website:'huamaoly@163.com (B2B 플랫폼 보유)', bizRegNo:'73809897-000-02-26-8 (HK BR) / 海南华茂 2019', foundedYear:2019, representative:'법인 등기 확인(대표자 성명 자료 추가 요청)',
-    contact:'Huamao', email:'huamaoly@163.com', deposit:10000, monthlyGMV:50000, salesRegion:'태국·글로벌', products:'태국·글로벌 호텔',
+    contact:'Huamao', email:'huamaoly@163.com', deposit:10000, monthlyGMV:50000, salesRegion:'일본·한국·베트남·글로벌', products:'일본·한국·베트남·글로벌 호텔',
     scores:[4,5,5,5,4,4,4,3,2,4,3,3,4,4], status:'검토중',
     docs:{'사업자등록증':'제출','회사소개서':'제출','은행정보':'미제출','계약서 초안':'미제출','정산조건 합의서':'미제출','파트너 레퍼런스':'제출','재무제표/매출자료':'미제출','대표자 신분확인':'미제출'},
     public:{'공식 웹사이트':'Y','LinkedIn/기업프로필':'불명','Google 검색결과':'Y','부정 뉴스':'N','소송/사기/미정산':'N','거래처/업계 레퍼런스':'Y','도메인 생성시점':'불명','회사주소 실존':'Y','대표자 업계이력':'Y'},
     documents:[{name:'사업자등록증(홍콩 BR)',file:'huamao_business license 1.pdf'},{name:'회사소개서(15p)',file:'Huamao introduction file 1.pdf'}],
-    notes:{expect:'홍콩법인(HUAMAO TOURISM (HK) LTD)·하이난 본사(海南华茂, 2019 설립) 실체 확인. 자체 분산시스템·API 밀리초 응답, 직계약 2000+ 호텔·연 58만 룸나이트·600개 목적지. 샤오홍슈·더우인 라이브커머스 엔드유저 및 완다·비구이위안·폴리 등 부동산 정적요금 확보 — 신규 채널 볼륨 기대 큼.',
+    notes:{expect:'홍콩법인·하이난 본사(2019 설립) 실체 확인. 60만 호텔·직계약 2000+·연 58만 RN. B2B 주력이며 B2C 플랫폼(sub-agent)도 운영. 일본·한국·베트남은 일 100~200 RN 예측. 샤오홍슈·더우인 라이브커머스·숏폼 판매, 공급사 Hotelbeds·WebBeds·Expedia·Trip.com·Rakuten·Restel·Fliggy·Meituan 등 광범위.',
       check:'은행정보·계약서·정산합의서·재무제표 미제출. 대표자 개인 성명/신분 자료 추가 필요. Deposit 커버율 0.43x로 예상 월거래액 대비 부족(상향 필요).',
-      opinion:'문서로 실체·사업모델·엔드유저 검증됨(기존 D-보류 → 상향). Deposit 상향 또는 초기 GMV 한도 설정 시 조건부 승인(B) 가능. 재무·은행 자료 보완 권고.'},
+      opinion:'실체·사업모델·엔드유저·공급망 검증됨(기존 D-보류 → 상향). Deposit 상향 또는 초기 GMV 한도(예: JP/KR/VN 일 100~200 RN) 설정 시 조건부 승인(B) 가능. 재무·은행 자료 보완 권고.'},
     history:[{stage:'영업 1차입력',reviewer:'Global OPs',decision:'보류',comment:'서류 미비·사업자 확인 필요',date:'2026-06-28'},
       {stage:'SCM/운영 검토',reviewer:'Global OPs',decision:'진행',comment:'폴더 자료 검토: HK BR·회사소개서 확인, 실체·엔드유저 검증 → 보류 해소',date:'2026-07-03'}] });
   const c2 = mk({ id:'C002', name:'Linkall Travel', country:'중국', businessType:'B2B',
-    market:'중국 아웃바운드', customerType:'B2B 여행사(개발역량 강점)',
-    website:'https://linkall.example', bizRegNo:'CN-3100-xxxxx', foundedYear:2019, representative:'확인 완료',
-    deposit:10000, monthlyGMV:30000, salesRegion:'글로벌', products:'글로벌 호텔',
-    scores:[3,4,3,3,2,3,3,3,2,4,3,2,3,3],
+    market:'유럽·일본·태국', customerType:'B2B 여행사(대표 개발자 출신·24/7 CS)',
+    website:'https://linkall.example', bizRegNo:'CN-3100-xxxxx', foundedYear:2019, representative:'확인 완료(대표: 개발자 출신)',
+    deposit:10000, monthlyGMV:30000, salesRegion:'유럽·일본·태국', products:'글로벌 호텔(Expedia·Hotelbeds·WebBeds)',
+    scores:[3,4,3,3,2,2,5,3,2,5,4,2,4,4],
     docs:{'사업자등록증':'제출','회사소개서':'제출','은행정보':'제출','계약서 초안':'제출','정산조건 합의서':'미제출','파트너 레퍼런스':'제출','재무제표/매출자료':'미제출','대표자 신분확인':'제출'},
-    notes:{expect:'개발역량 강점으로 API 안정 연동 기대',
-      check:'기존 고객사와 채널 중복 가능성, Deposit 커버율 부족, 재무제표 미제출',
-      opinion:'기술력은 양호하나 차별성·Deposit 보완 시 조건부 승인 검토 가능'} });
+    notes:{expect:'대표 개발자 출신으로 기술력 강함(연동 2~3일 가능). 일 5,000~6,000건 예약(일본 ~30%), 유럽·일본·태국 주력. 24/7 CS 운영.',
+      check:'공급사가 Expedia·Hotelbeds·WebBeds 등 대형 애그리게이터 중심 → 유니크 인벤토리·기존 채널 중복도 확인 필요. 사업자등록·재무제표 등 서류 미제출. Deposit 커버율 0.71x 부족.',
+      opinion:'거래량·기술력은 매력적이나 인벤토리 차별성이 낮고 Deposit 부족 → 추가 확인. 서류 징구·Deposit 상향·유니크 요금 확인 시 조건부 승인 가능.'} });
   const c3 = mk({ id:'C003', name:'Wingpulse (WINGSPULSE TECH)', country:'홍콩(중국계)', businessType:'B2B/TMC',
-    market:'LCC 항공+호텔 커넥티비티', customerType:'OTA·TMC·DMC (커넥티비티)',
+    market:'호텔 직계약+LCC 항공 (Travel Tech)', customerType:'DMC·여행사·OTA·TMC',
     website:'www.wingspulse.com / info@wingspulse.com', bizRegNo:'51588485 (HK BR)', foundedYear:2025, representative:'HE PENG(贺鹏), 단독이사',
-    contact:'WingsPulse', email:'info@wingspulse.com', deposit:10000, monthlyGMV:40000, salesRegion:'글로벌·기업출장', products:'글로벌 호텔·LCC 항공',
-    scores:[2,3,3,4,3,3,2,2,2,4,3,2,4,2], status:'검토중',
+    contact:'WingsPulse', email:'info@wingspulse.com', deposit:10000, monthlyGMV:40000, salesRegion:'동남아·한국·중국(HK·대만·마카오)', products:'역내 호텔 260+ 직계약 · LCC 항공',
+    scores:[2,4,3,4,3,4,3,2,2,4,3,2,4,3], status:'검토중',
     docs:{'사업자등록증':'제출','회사소개서':'제출','은행정보':'미제출','계약서 초안':'미제출','정산조건 합의서':'미제출','파트너 레퍼런스':'제출','재무제표/매출자료':'제출','대표자 신분확인':'미제출'},
     public:{'공식 웹사이트':'Y','LinkedIn/기업프로필':'불명','Google 검색결과':'Y','부정 뉴스':'N','소송/사기/미정산':'N','거래처/업계 레퍼런스':'Y','도메인 생성시점':'불명','회사주소 실존':'Y','대표자 업계이력':'Y'},
     documents:[{name:'사업자등록·감사 재무제표(17p)',file:'Business license wingpulse 1.pdf'},{name:'회사소개서(영문)',file:'Wing pulse intro-English 1.jpg'}],
-    notes:{expect:'LCC 항공 데이터 애그리게이션(전신 Alfa Aggregators) 기반 기술력, NDC·100+ 항공사, 호텔 분산 기술 dual-track. OTA·TMC·DMC 대상 커넥티비티 — 기술 잠재력은 높음.',
-      check:'★감사 재무제표상 해당연도 무영업(inactive)·매출 0, 2025.5 사명 변경(ALFA AGGREGATORS→WINGSPULSE), 자산 대부분이 이사·주주 대여금(HE PENG 등). 실거래 실적·운영 증빙 부재. Deposit 커버율 0.54x 부족.',
-      opinion:'법인·감사보고서는 투명하나 실질 영업 실적이 없는 신설 리브랜드 법인 → 현 단계 보류(D). 선입금/Deposit 대폭 상향 및 실거래 파일럿·매출 증빙 확인 후 재평가 권고.'},
+    notes:{expect:'AI·시맨틱 태깅 기반 데이터 정확성·거래효율 중심 Travel Tech(홍콩·선전 거점). 동남아·한국·중국(홍콩·대만·마카오) 직계약 호텔 260+ 및 현지 DMC 협력, LCC 항공(NDC·100+ 항공사) dual-track. 밀리초 API·실시간 재고.',
+      check:'★회사 제공 정보상 260+ 직계약·운영 거점이 있으나, 제출된 감사 재무제표(2026.3)는 무영업(inactive)·매출 0으로 상충. 2025.5 사명 변경(ALFA→WINGSPULSE), 자산 대부분 이사·주주 대여금. 실거래·매출 증빙 필수. Deposit 커버율 0.54x 부족.',
+      opinion:'기술력·직계약 인벤토리는 긍정적이나 감사보고서상 실적 부재가 핵심 리스크 → 추가 확인(기존 보류 → 상향). 실거래 파일럿·매출 증빙 및 Deposit 상향 확인 시 조건부 승인 검토.'},
     history:[{stage:'영업 1차입력',reviewer:'Global OPs',decision:'진행',comment:'TMC/커넥티비티 기술 파트너 후보',date:'2026-06-27'},
-      {stage:'재무 정산검토',reviewer:'Global OPs',decision:'보류',comment:'폴더 자료 검토: 감사보고서상 무영업·매출0, 사명변경 → 실적 증빙까지 보류',date:'2026-07-03'}] });
+      {stage:'재무 정산검토',reviewer:'Global OPs',decision:'보류',comment:'폴더 자료 검토: 감사보고서상 무영업·매출0, 사명변경 → 실적 증빙까지 보류',date:'2026-07-03'},
+      {stage:'SCM/운영 검토',reviewer:'Global OPs',decision:'진행',comment:'추가정보(260+ 직계약·DMC 협력) 반영해 상향, 단 감사상 무영업과 상충 → 실거래 증빙 조건 추가확인',date:'2026-07-03'}] });
   const c4 = mk({ id:'C004', name:'Happy Travel', country:'두바이(UAE)', businessType:'B2B/TMC',
     market:'중동', customerType:'중동 기업/여행사(태국 호텔 수요)',
     website:'https://happytravel.example', bizRegNo:'AE-DXB-xxxxx', foundedYear:2018, representative:'확인 완료',
