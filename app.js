@@ -172,10 +172,11 @@ function viewDashboard(){
   const reject = count('E');
   const cards = `<div class="cards">
     <div class="card"><div class="k">전체 업체</div><div class="v">${list.length}</div></div>
-    <div class="card"><div class="k">승인권(A·B)</div><div class="v" style="color:var(--gA)">${approve}</div></div>
-    <div class="card"><div class="k">확인·보류(C·D)</div><div class="v" style="color:var(--gD)">${hold}</div></div>
-    <div class="card"><div class="k">거절 추천(E)</div><div class="v" style="color:var(--gE)">${reject}</div></div>
-  </div>`;
+    <div class="card"><div class="k">승인권 (최종 A·B)</div><div class="v" style="color:var(--gA)">${approve}</div></div>
+    <div class="card"><div class="k">확인·보류 (최종 C·D)</div><div class="v" style="color:var(--gD)">${hold}</div></div>
+    <div class="card"><div class="k">거절 추천 (최종 E)</div><div class="v" style="color:var(--gE)">${reject}</div></div>
+  </div>
+  <p class="hint" style="margin:-10px 0 18px">※ 요약 카드와 판정은 <b>레드플래그가 반영된 ‘최종 판정’</b> 기준입니다. ‘점수등급’은 참고용이며, 레드플래그가 있으면 최종 판정이 강등됩니다(예: 점수 B라도 Deposit 부족 시 최종 C).</p>`;
   const rows = list.map(({c,r})=>`
     <tr data-open="${c.id}">
       <td><b>${esc(c.name||'(미입력)')}</b><div class="hint">${esc(c.id)} · ${esc(c.businessType||'-')}</div></td>
@@ -190,7 +191,7 @@ function viewDashboard(){
   const table = list.length ? `<div class="panel"><h3>업체별 리스크 요약</h3>
     <div class="table-wrap"><table><thead><tr>
       <th>업체</th><th class="ctr">국가</th><th class="num">Deposit</th><th class="ctr">커버율</th>
-      <th class="num">가중점수</th><th class="ctr">점수등급</th><th class="ctr">최종 판정</th><th>레드플래그</th>
+      <th class="num">가중점수</th><th class="ctr">점수등급<br><span class="hint" style="font-weight:400">(참고)</span></th><th class="ctr">최종 판정<br><span class="hint" style="font-weight:400">(레드플래그 반영)</span></th><th>레드플래그</th>
     </tr></thead><tbody>${rows}</tbody></table></div></div>`
     : `<div class="panel"><div class="empty">등록된 업체가 없습니다. 우측 상단 <b>+ 신규 업체</b>로 시작하세요.</div></div>`;
   const guide = `<div class="panel"><h3>사용 순서</h3><div class="body" style="color:#54637a;font-size:13px;line-height:1.9">
