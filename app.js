@@ -189,7 +189,7 @@ function viewDashboard(){
       <td><div class="flaglist">${r.allFlags.length? r.allFlags.map(f=>`<span class="flag">${esc(f)}</span>`).join('') : '<span class="flag ok">없음</span>'}</div></td>
       <td><div class="comment-cell"><span class="cscore">${esc(c.scores[13])}/5</span> ${esc(c.notes.comment||'-')}</div></td>
     </tr>`).join('');
-  const table = list.length ? `<div class="panel"><h3>업체별 리스크 요약</h3>
+  const table = list.length ? `<div class="panel"><h3 style="display:flex;align-items:center;justify-content:space-between;gap:12px">업체별 리스크 요약 <button class="btn sm" data-act="copysummary">📋 표 복사</button></h3>
     <div class="table-wrap"><table><thead><tr>
       <th>업체</th><th class="ctr">국가</th><th class="num">Deposit</th><th class="ctr">커버율</th>
       <th class="num">가중점수</th><th class="ctr">점수등급<br><span class="hint" style="font-weight:400">(참고)</span></th><th class="ctr">최종 판정<br><span class="hint" style="font-weight:400">(레드플래그 반영)</span></th><th>레드플래그</th><th>담당자 코멘트<br><span class="hint" style="font-weight:400">(점수/5)</span></th>
@@ -436,6 +436,7 @@ function act(a){
   else if(a==='print'){ window.print(); }
   else if(a==='copyreport'){ copyReport(); }
   else if(a==='addhist'){ addHist(); }
+  else if(a==='copysummary'){ copySummary(); }
 }
 
 /* content-level delegation (inputs, tabs, row open) */
@@ -499,6 +500,44 @@ function addHist(){
   const date=document.getElementById('h-date').value;
   if(!reviewer){ alert('검토자를 입력하세요.'); return; }
   c.history.push({stage,reviewer,decision,comment,date}); save(); render();
+}
+
+/* ---------- clipboard ---------- */
+function copyText(text, okMsg){
+  const done=()=>alert(okMsg||'복사되었습니다.');
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(done, ()=>fallbackCopy(text, okMsg));
+  } else fallbackCopy(text, okMsg);
+}
+function fallbackCopy(text, okMsg){
+  const ta=document.createElement('textarea'); ta.value=text;
+  ta.style.position='fixed'; ta.style.top='-1000px'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  let ok=false; try{ ok=document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta);
+  alert(ok ? (okMsg||'복사되었습니다.') : '복사 실패 — 표를 직접 선택해 복사하세요.');
+}
+
+/* ---------- summary table copy (TSV) ---------- */
+function copySummary(){
+  const clean = s => String(s==null?'':s).replace(/[\t\r\n]+/g,' ').trim();
+  const cols = ['업체ID','업체명','국가','사업유형','Deposit(USD)','커버율','가중점수','점수등급','최종판정','레드플래그','담당자코멘트점수','담당자코멘트'];
+  const lines = [cols.join('\t')];
+  DATA.companies.forEach(c=>{
+    const r = compute(c);
+    lines.push([
+      c.id, c.name, c.country, c.businessType,
+      Number(c.deposit)||0,
+      r.coverage==null?'-':r.coverage.toFixed(2)+'x',
+      r.weighted.toFixed(1),
+      r.scoreGrade,
+      r.finalGrade+'-'+GRADE_META[r.finalGrade].label,
+      r.allFlags.length? r.allFlags.join('; '):'없음',
+      c.scores[13],
+      c.notes.comment||''
+    ].map(clean).join('\t'));
+  });
+  copyText(lines.join('\n'), DATA.companies.length+'개 업체 리스크 요약이 복사되었습니다. Excel·메일·Word에 붙여넣기 하세요(탭 구분).');
 }
 
 /* ---------- report copy ---------- */
