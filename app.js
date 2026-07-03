@@ -23,7 +23,7 @@ const GRADE_META = {
   C:{label:'추가 확인 필요', cls:'g-C'}, D:{label:'보류', cls:'g-D'}, E:{label:'거절 추천', cls:'g-E'}
 };
 const RANK = {A:0,B:1,C:2,D:3,E:4};
-const STORE_KEY = 'omh_prg_v5';
+const STORE_KEY = 'omh_prg_v6';
 
 /* ---------- state ---------- */
 let DATA = load();
@@ -564,16 +564,16 @@ function seed(){
       comment:'실체·공급망 검증 완료로 신뢰도 높게 봄(4/5). Deposit 커버율만 보완되면 승인 추천 가능. 초기 JP/KR/VN RN 한도부터 시작 권장.'},
     history:[{stage:'영업 1차입력',reviewer:'Global OPs',decision:'보류',comment:'서류 미비·사업자 확인 필요',date:'2026-06-28'},
       {stage:'SCM/운영 검토',reviewer:'Global OPs',decision:'진행',comment:'폴더 자료 검토: HK BR·회사소개서 확인, 실체·엔드유저 검증 → 보류 해소',date:'2026-07-03'}] });
-  const c2 = mk({ id:'C002', name:'Linkall Travel', country:'중국', businessType:'B2B',
+  const c2 = mk({ id:'C002', name:'Linkall Travel', country:'중국(홍콩법인)', businessType:'B2B',
     market:'유럽·일본·태국', customerType:'B2B 여행사(대표 개발자 출신·24/7 CS)',
-    website:'https://linkall.example', bizRegNo:'CN-3100-xxxxx', foundedYear:2019, representative:'확인 완료(대표: 개발자 출신)',
+    website:'http://linkalltravel.com', bizRegNo:'70069113 (HK BR · FUNTRIP HONGKONG LIMITED)', foundedYear:2019, representative:'확인 완료(대표: 개발자 출신)',
     deposit:10000, monthlyGMV:30000, salesRegion:'유럽·일본·태국', products:'글로벌 호텔(Expedia·Hotelbeds·WebBeds)',
-    scores:[3,4,3,3,2,2,5,3,2,5,4,2,4,4],
+    scores:[4,4,3,3,2,2,5,3,2,5,4,3,5,5],
     docs:{'사업자등록증':'제출','회사소개서':'제출','은행정보':'제출','계약서 초안':'제출','정산조건 합의서':'미제출','파트너 레퍼런스':'제출','재무제표/매출자료':'미제출','대표자 신분확인':'제출'},
-    notes:{expect:'대표 개발자 출신으로 기술력 강함(연동 2~3일 가능). 일 5,000~6,000건 예약(일본 ~30%), 유럽·일본·태국 주력. 24/7 CS 운영.',
-      check:'공급사가 Expedia·Hotelbeds·WebBeds 등 대형 애그리게이터 중심 → 유니크 인벤토리·기존 채널 중복도 확인 필요. 사업자등록·재무제표 등 서류 미제출. Deposit 커버율 0.71x 부족.',
-      opinion:'거래량·기술력은 매력적이나 인벤토리 차별성이 낮고 Deposit 부족 → 추가 확인. 서류 징구·Deposit 상향·유니크 요금 확인 시 조건부 승인 가능.',
-      comment:'일 5~6천 예약·빠른 연동은 큰 강점(4/5). 다만 대형 애그리게이터 리셀이라 우리 인벤토리와 중복 우려 → 유니크 요금·서류 확인이 승인 전제.'} });
+    notes:{expect:'홍콩법인 FUNTRIP HONGKONG LIMITED(BR 70069113, 퀸즈로드센트럴 145-149) 실체 확인, 웹사이트 linkalltravel.com. 최근 연 TTV 9억 HKD(~1.15억 USD) 대규모 거래. 대표 개발자 출신(연동 2~3일), 일 5,000~6,000건 예약(일본 ~30%), 24/7 CS.',
+      check:'공급사가 Expedia·Hotelbeds·WebBeds 등 대형 애그리게이터 중심 → 유니크 인벤토리·기존 채널 중복도 확인 필요. 감사 재무제표 미제출(TTV 9억 HKD는 자기신고). Deposit 커버율 0.71x 부족.',
+      opinion:'홍콩법인·대규모 TTV·기술력 확인으로 점수등급 B 수준(기존 C→상향). Deposit 상향 시 승인 가능. 인벤토리 차별성·재무제표만 보완 권고.',
+      comment:'홍콩법인·9억 HKD TTV로 실체·규모 확인, 신뢰도 상향(5/5). 남은 과제는 애그리게이터 리셀 중복과 Deposit 부족 → Deposit 보완 시 승인 추천.'} });
   const c3 = mk({ id:'C003', name:'Wingpulse (WINGSPULSE TECH)', country:'홍콩(중국계)', businessType:'B2B/TMC',
     market:'호텔 직계약+LCC 항공 (Travel Tech)', customerType:'DMC·여행사·OTA·TMC',
     website:'www.wingspulse.com / info@wingspulse.com', bizRegNo:'51588485 (HK BR)', foundedYear:2025, representative:'HE PENG(贺鹏), 단독이사',
