@@ -3,8 +3,9 @@
 
 /* ---------- constants ---------- */
 const ITEM_NAMES = ['회사 신뢰도','사업모델 명확성','엔드유저 보유','판매채널 차별성','기존고객 중복도(낮을수록↑)',
-  '유니크 인벤토리','예상 매출기여도','정산 리스크','Deposit 충분성','API/기술 안정성','운영 커뮤니케이션','국가별 법무/정산','장기 성장성'];
-const DEFAULT_WEIGHTS = [12,8,8,6,6,6,8,12,12,6,5,6,5];
+  '유니크 인벤토리','예상 매출기여도','정산 리스크','Deposit 충분성','API/기술 안정성','운영 커뮤니케이션','국가별 법무/정산','장기 성장성',
+  '담당자 코멘트 점수'];
+const DEFAULT_WEIGHTS = [12,8,8,6,6,6,8,12,12,6,5,6,5,10];
 const DEFAULT_THRESHOLDS = { A:85, B:70, C:55, D:40 };
 const DOC_KEYS = ['사업자등록증','회사소개서','은행정보','계약서 초안','정산조건 합의서','파트너 레퍼런스','재무제표/매출자료','대표자 신분확인'];
 const PUBLIC_KEYS = ['공식 웹사이트','LinkedIn/기업프로필','Google 검색결과','부정 뉴스','소송/사기/미정산','거래처/업계 레퍼런스','도메인 생성시점','회사주소 실존','대표자 업계이력'];
@@ -22,7 +23,7 @@ const GRADE_META = {
   C:{label:'추가 확인 필요', cls:'g-C'}, D:{label:'보류', cls:'g-D'}, E:{label:'거절 추천', cls:'g-E'}
 };
 const RANK = {A:0,B:1,C:2,D:3,E:4};
-const STORE_KEY = 'omh_prg_v2';
+const STORE_KEY = 'omh_prg_v3';
 
 /* ---------- state ---------- */
 let DATA = load();
@@ -61,7 +62,7 @@ function blankCompany(){
     salesRegion:'', products:'', apiIntegration:'Y', manualBooking:'N', cancelNoshowRisk:'보통',
     docs:Object.fromEntries(DOC_KEYS.map(k=>[k,'미제출'])),
     public:Object.fromEntries(PUBLIC_KEYS.map(k=>[k,'불명'])),
-    scores:new Array(13).fill(3),
+    scores:new Array(ITEM_NAMES.length).fill(3),
     notes:{expect:'', check:'', opinion:''},
     documents:[],
     history:[]
@@ -70,7 +71,9 @@ function blankCompany(){
 function normalizeCompany(c){
   c.docs = c.docs || {}; DOC_KEYS.forEach(k=>{ if(!(k in c.docs)) c.docs[k]='미제출'; });
   c.public = c.public || {}; PUBLIC_KEYS.forEach(k=>{ if(!(k in c.public)) c.public[k]='불명'; });
-  if(!Array.isArray(c.scores)||c.scores.length!==13) c.scores=new Array(13).fill(3);
+  if(!Array.isArray(c.scores)) c.scores=[];
+  while(c.scores.length < ITEM_NAMES.length) c.scores.push(3);
+  if(c.scores.length > ITEM_NAMES.length) c.scores = c.scores.slice(0, ITEM_NAMES.length);
   c.notes = c.notes || {expect:'',check:'',opinion:''};
   c.documents = c.documents || [];
   c.history = c.history || [];
@@ -90,8 +93,10 @@ function compute(c){
   const exposure = gmv * days/30;
   const hasCov = dep>0 && exposure>0;
   const coverage = hasCov ? dep/exposure : (exposure>0 && dep===0 ? 0 : null);
-  let weighted = 0;
-  for(let i=0;i<13;i++) weighted += (Number(c.scores[i])||0)/5 * (Number(s.weights[i])||0);
+  let acc=0, wsum=0;
+  const n = Math.min(c.scores.length, s.weights.length);
+  for(let i=0;i<n;i++){ const w=Number(s.weights[i])||0; acc += (Number(c.scores[i])||0)/5 * w; wsum += w; }
+  const weighted = wsum>0 ? acc/wsum*100 : 0;
   const t = s.thresholds;
   const scoreGrade = weighted>=t.A?'A':weighted>=t.B?'B':weighted>=t.C?'C':weighted>=t.D?'D':'E';
 
@@ -225,9 +230,9 @@ function viewSettings(){
     <div class="field"><label>${g} 등급 하한 (${GRADE_META[g].label})</label>
     <input type="number" data-threshold="${g}" value="${s.thresholds[g]}"></div>`).join('');
   return `
-  <div class="panel"><h3>리스크 항목 가중치 <span class="pill">합계 ${sum} / 100</span></h3>
+  <div class="panel"><h3>리스크 항목 가중치 <span class="pill">가중치 합계 ${sum}</span></h3>
     <div class="body"><div class="form-grid three">${wr}</div>
-    <p class="hint" style="margin-top:14px">가중점수 = Σ(항목점수 ÷ 5 × 가중치). 합계 100 기준 만점 100점 권장.</p></div></div>
+    <p class="hint" style="margin-top:14px">가중점수 = Σ(항목점수 ÷ 5 × 가중치) ÷ 가중치합 × 100 — <b>100점 만점으로 자동 정규화</b>됩니다. 합계가 100이 아니어도 됩니다. ‘담당자 코멘트 점수’는 담당자가 리스크 평가 탭에서 1~5점으로 매기는 종합 주관 점수입니다.</p></div></div>
   <div class="panel"><h3>등급 임계값 (가중점수 ≥)</h3>
     <div class="body"><div class="form-grid">${tr}</div>
     <p class="hint" style="margin-top:14px">A≥${s.thresholds.A} · B≥${s.thresholds.B} · C≥${s.thresholds.C} · D≥${s.thresholds.D} · 그 미만 E(거절추천). 레드플래그 발견 시 점수와 무관하게 C 또는 D로 강등됩니다.</p></div></div>`;
@@ -544,7 +549,7 @@ function seed(){
     market:'중국 아웃바운드', customerType:'라이브커머스(샤오홍슈·더우인) 엔드유저 + OTA·여행사',
     website:'huamaoly@163.com (B2B 플랫폼 보유)', bizRegNo:'73809897-000-02-26-8 (HK BR) / 海南华茂 2019', foundedYear:2019, representative:'법인 등기 확인(대표자 성명 자료 추가 요청)',
     contact:'Huamao', email:'huamaoly@163.com', deposit:10000, monthlyGMV:50000, salesRegion:'태국·글로벌', products:'태국·글로벌 호텔',
-    scores:[4,5,5,5,4,4,4,3,2,4,3,3,4], status:'검토중',
+    scores:[4,5,5,5,4,4,4,3,2,4,3,3,4,4], status:'검토중',
     docs:{'사업자등록증':'제출','회사소개서':'제출','은행정보':'미제출','계약서 초안':'미제출','정산조건 합의서':'미제출','파트너 레퍼런스':'제출','재무제표/매출자료':'미제출','대표자 신분확인':'미제출'},
     public:{'공식 웹사이트':'Y','LinkedIn/기업프로필':'불명','Google 검색결과':'Y','부정 뉴스':'N','소송/사기/미정산':'N','거래처/업계 레퍼런스':'Y','도메인 생성시점':'불명','회사주소 실존':'Y','대표자 업계이력':'Y'},
     documents:[{name:'사업자등록증(홍콩 BR)',file:'huamao_business license 1.pdf'},{name:'회사소개서(15p)',file:'Huamao introduction file 1.pdf'}],
@@ -557,7 +562,7 @@ function seed(){
     market:'중국 아웃바운드', customerType:'B2B 여행사(개발역량 강점)',
     website:'https://linkall.example', bizRegNo:'CN-3100-xxxxx', foundedYear:2019, representative:'확인 완료',
     deposit:10000, monthlyGMV:30000, salesRegion:'글로벌', products:'글로벌 호텔',
-    scores:[3,4,3,3,2,3,3,3,2,4,3,2,3],
+    scores:[3,4,3,3,2,3,3,3,2,4,3,2,3,3],
     docs:{'사업자등록증':'제출','회사소개서':'제출','은행정보':'제출','계약서 초안':'제출','정산조건 합의서':'미제출','파트너 레퍼런스':'제출','재무제표/매출자료':'미제출','대표자 신분확인':'제출'},
     notes:{expect:'개발역량 강점으로 API 안정 연동 기대',
       check:'기존 고객사와 채널 중복 가능성, Deposit 커버율 부족, 재무제표 미제출',
@@ -566,7 +571,7 @@ function seed(){
     market:'LCC 항공+호텔 커넥티비티', customerType:'OTA·TMC·DMC (커넥티비티)',
     website:'www.wingspulse.com / info@wingspulse.com', bizRegNo:'51588485 (HK BR)', foundedYear:2025, representative:'HE PENG(贺鹏), 단독이사',
     contact:'WingsPulse', email:'info@wingspulse.com', deposit:10000, monthlyGMV:40000, salesRegion:'글로벌·기업출장', products:'글로벌 호텔·LCC 항공',
-    scores:[2,3,3,4,3,3,2,2,2,4,3,2,4], status:'검토중',
+    scores:[2,3,3,4,3,3,2,2,2,4,3,2,4,2], status:'검토중',
     docs:{'사업자등록증':'제출','회사소개서':'제출','은행정보':'미제출','계약서 초안':'미제출','정산조건 합의서':'미제출','파트너 레퍼런스':'제출','재무제표/매출자료':'제출','대표자 신분확인':'미제출'},
     public:{'공식 웹사이트':'Y','LinkedIn/기업프로필':'불명','Google 검색결과':'Y','부정 뉴스':'N','소송/사기/미정산':'N','거래처/업계 레퍼런스':'Y','도메인 생성시점':'불명','회사주소 실존':'Y','대표자 업계이력':'Y'},
     documents:[{name:'사업자등록·감사 재무제표(17p)',file:'Business license wingpulse 1.pdf'},{name:'회사소개서(영문)',file:'Wing pulse intro-English 1.jpg'}],
@@ -579,7 +584,7 @@ function seed(){
     market:'중동', customerType:'중동 기업/여행사(태국 호텔 수요)',
     website:'https://happytravel.example', bizRegNo:'AE-DXB-xxxxx', foundedYear:2018, representative:'확인 완료',
     deposit:30000, monthlyGMV:60000, salesRegion:'태국', products:'태국 호텔', manualBooking:'Y', apiIntegration:'부분',
-    scores:[4,4,4,4,4,3,5,4,3,3,3,3,4],
+    scores:[4,4,4,4,4,3,5,4,3,3,3,3,4,4],
     notes:{expect:'중동 고객사 통한 태국 호텔 볼륨 증가 기대, Deposit USD 30,000로 상대적 견고',
       check:'수기예약 비중·중동 정산/법무 리스크 확인 필요',
       opinion:'종합 리스크 낮음. 초기 3개월 GMV 한도·모니터링 조건부 승인 추천'},
