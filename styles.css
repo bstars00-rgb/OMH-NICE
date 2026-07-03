@@ -40,7 +40,7 @@ a{color:var(--primary-2);text-decoration:none}
 }
 .topbar h2{margin:0;font-size:18px}
 .topbar .sub{color:var(--muted);font-size:12.5px;margin-top:2px}
-.content{padding:24px 28px 60px;max-width:1180px;width:100%}
+.content{padding:24px 36px 60px;max-width:1720px;width:100%}
 
 /* buttons */
 .btn{border:1px solid var(--line);background:#fff;color:var(--text);padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600}
