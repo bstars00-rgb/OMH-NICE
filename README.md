@@ -1,4 +1,4 @@
-# OMH Partner Risk Gate
+# 오마이나이스 (OMH-NICE)
 
 Ohmyhotel 신규 **B2B/TMC 파트너 거래 리스크 평가 플랫폼** — MVP 프로토타입.
 
