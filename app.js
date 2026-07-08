@@ -7,6 +7,8 @@ const ITEM_NAMES = ['회사 신뢰도','사업모델 명확성','엔드유저 �
   '담당자 코멘트 점수'];
 const DEFAULT_WEIGHTS = [12,8,8,6,6,6,8,12,12,6,5,6,5,10];
 const DEFAULT_THRESHOLDS = { A:85, B:70, C:55, D:40 };
+// 등급별 요구커버율: 신용도 높을수록 Deposit 요구 낮음(오픈 크레딧). 필요 Deposit = 2주 노출 × 요구커버율
+const REQUIRED_COVERAGE = { A:0, B:0.2, C:0.5, D:1, E:1 };
 const DOC_KEYS = ['사업자등록증','회사소개서','은행정보','계약서 초안','정산조건 합의서','파트너 레퍼런스','재무제표/매출자료','대표자 신분확인'];
 const PUBLIC_KEYS = ['공식 웹사이트','LinkedIn/기업프로필','Google 검색결과','부정 뉴스','소송/사기/미정산','거래처/업계 레퍼런스','도메인 생성시점','회사주소 실존','대표자 업계이력'];
 const NEG_PUBLIC = ['부정 뉴스','소송/사기/미정산']; // Y = bad
@@ -23,7 +25,7 @@ const GRADE_META = {
   C:{label:'추가 확인 필요', cls:'g-C'}, D:{label:'보류', cls:'g-D'}, E:{label:'거절 추천', cls:'g-E'}
 };
 const RANK = {A:0,B:1,C:2,D:3,E:4};
-const STORE_KEY = 'omh_prg_v9';
+const STORE_KEY = 'omh_prg_v10';
 
 /* ---------- state ---------- */
 let DATA = load();
@@ -108,7 +110,9 @@ function compute(c){
   const uncoveredCredit = c.creditRequired==='Y' && dep===0;
   const websiteNo = c.public['공식 웹사이트']==='N' || !c.website || c.website.trim()==='' || /확인필요/.test(c.website);
   const repMissing = !c.representative || c.representative.trim()==='' || /확인필요/.test(c.representative);
-  const depositShort = hasCov && coverage<1;
+  const reqCov = (scoreGrade in REQUIRED_COVERAGE) ? REQUIRED_COVERAGE[scoreGrade] : 1;
+  const requiredDeposit = exposure * reqCov;
+  const depositShort = exposure>0 && reqCov>0 && dep < requiredDeposit - 1e-6;
   const slowSettle = days>=30;
 
   const dFlags=[], cFlags=[];
@@ -119,7 +123,7 @@ function compute(c){
   if(uncoveredCredit) dFlags.push('Deposit 없이 Credit 요청');
   if(websiteNo) cFlags.push('웹사이트 없음/미확인');
   if(repMissing) cFlags.push('대표자 정보 확인 불가');
-  if(depositShort) cFlags.push('Deposit 부족(커버율<1.0)');
+  if(depositShort) cFlags.push('Deposit 부족(필요 ≥$'+Math.round(requiredDeposit).toLocaleString('en-US')+')');
   if(slowSettle) cFlags.push('정산주기 30일 이상');
 
   let rank = RANK[scoreGrade];
@@ -128,6 +132,7 @@ function compute(c){
   const finalGrade = Object.keys(RANK).find(k=>RANK[k]===rank);
 
   return { exposure, coverage, hasCov, weighted, scoreGrade, finalGrade, dFlags, cFlags,
+           reqCov, requiredDeposit, depositShort,
            allFlags:[...dFlags, ...cFlags] };
 }
 
@@ -135,7 +140,7 @@ function compute(c){
 const esc = s => String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 function badge(g){ const m=GRADE_META[g]; return `<span class="badge ${m.cls}"><span class="dot"></span>${g} · ${m.label}</span>`; }
 function opts(list, val){ return list.map(o=>`<option ${o===val?'selected':''}>${esc(o)}</option>`).join(''); }
-function fmtUSD(n){ n=Number(n)||0; return '$'+n.toLocaleString('en-US'); }
+function fmtUSD(n){ n=Math.round(Number(n)||0); return '$'+n.toLocaleString('en-US'); }
 function fmtCov(cov){ return cov==null?'—':cov.toFixed(2)+'x'; }
 function updateFoot(){ const el=document.getElementById('foot-count'); if(el) el.textContent = DATA.companies.length+'개 업체 등록됨'; }
 
@@ -303,8 +308,9 @@ function tabDeal(c){
     ${sel('취소/노쇼 리스크','cancelNoshowRisk',c.cancelNoshowRisk,['낮음','보통','높음'])}
   </div>
   <div class="result" style="margin-top:18px">
-    <div class="box"><div class="k">Deposit 노출액</div><div class="v">${fmtUSD(r.exposure)}</div><div class="hint">월거래액 × 정산주기/30</div></div>
-    <div class="box"><div class="k">Deposit 커버율</div><div class="v" style="color:${r.coverage!=null&&r.coverage<1?'var(--gE)':'var(--gA)'}">${fmtCov(r.coverage)}</div><div class="hint">1.0x 미만 시 C 강등</div></div>
+    <div class="box"><div class="k">2주 노출액</div><div class="v">${fmtUSD(r.exposure)}</div><div class="hint">월거래액 × 정산주기/30</div></div>
+    <div class="box"><div class="k">요구 Deposit (등급 ${r.scoreGrade}·${Math.round(r.reqCov*100)}%)</div><div class="v">${fmtUSD(r.requiredDeposit)}</div><div class="hint">노출 × 등급별 요구커버율(A0·B20·C50·D100%)</div></div>
+    <div class="box"><div class="k">Deposit 충족</div><div class="v" style="color:${r.depositShort?'var(--gE)':'var(--gA)'}">${r.exposure>0?(r.depositShort?'부족':'충족'):'—'}</div><div class="hint">현재 ${fmtUSD(c.deposit)} · 커버율 ${fmtCov(r.coverage)}</div></div>
   </div></div></div>`;
 }
 function tabDocs(c){
