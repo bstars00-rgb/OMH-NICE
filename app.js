@@ -23,7 +23,7 @@ const GRADE_META = {
   C:{label:'추가 확인 필요', cls:'g-C'}, D:{label:'보류', cls:'g-D'}, E:{label:'거절 추천', cls:'g-E'}
 };
 const RANK = {A:0,B:1,C:2,D:3,E:4};
-const STORE_KEY = 'omh_prg_v8';
+const STORE_KEY = 'omh_prg_v9';
 
 /* ---------- state ---------- */
 let DATA = load();
@@ -631,31 +631,33 @@ function seed(){
     website:'huamaoly@163.com (B2B 플랫폼 보유)', bizRegNo:'73809897-000-02-26-8 (HK BR) / 海南华茂 2019', foundedYear:2019, representative:'법인 등기 확인(대표자 성명 자료 추가 요청)',
     contact:'Huamao', email:'huamaoly@163.com', deposit:10000, monthlyGMV:50000, salesRegion:'일본·한국·베트남·글로벌', products:'일본·한국·베트남·글로벌 호텔',
     scores:[4,5,5,5,4,4,4,3,2,4,3,3,4,4], status:'검토중',
-    docs:{'사업자등록증':'제출','회사소개서':'제출','은행정보':'미제출','계약서 초안':'미제출','정산조건 합의서':'미제출','파트너 레퍼런스':'제출','재무제표/매출자료':'미제출','대표자 신분확인':'미제출'},
+    docs:{'사업자등록증':'제출','회사소개서':'제출','은행정보':'미제출','계약서 초안':'미제출','정산조건 합의서':'제출','파트너 레퍼런스':'제출','재무제표/매출자료':'미제출','대표자 신분확인':'미제출'},
     public:{'공식 웹사이트':'Y','LinkedIn/기업프로필':'불명','Google 검색결과':'Y','부정 뉴스':'N','소송/사기/미정산':'N','거래처/업계 레퍼런스':'Y','도메인 생성시점':'불명','회사주소 실존':'Y','대표자 업계이력':'Y'},
     documents:[{name:'사업자등록증(홍콩 BR)',file:'huamao_business license 1.pdf'},{name:'회사소개서(15p)',file:'Huamao introduction file 1.pdf'}],
     notes:{expect:'홍콩법인·하이난 본사(2019 설립) 실체 확인. 60만 호텔·직계약 2000+·연 58만 RN. B2B 주력이며 B2C 플랫폼(sub-agent)도 운영. 일본·한국·베트남은 일 100~200 RN 예측. 샤오홍슈·더우인 라이브커머스·숏폼 판매, 공급사 Hotelbeds·WebBeds·Expedia·Trip.com·Rakuten·Restel·Fliggy·Meituan 등 광범위.',
-      check:'은행정보·계약서·정산합의서·재무제표 미제출. 대표자 개인 성명/신분 자료 추가 필요. Deposit 커버율 0.43x로 예상 월거래액 대비 부족(상향 필요).',
+      check:'은행정보·계약서·재무제표 미제출. 대표자 개인 성명/신분 자료 추가 필요. Deposit 커버율 0.43x로 예상 월거래액 대비 부족(상향 필요). ※정산조건 2주·USD 합의 완료.',
       opinion:'실체·사업모델·엔드유저·공급망 검증됨(기존 D-보류 → 상향). Deposit 상향 또는 초기 GMV 한도(예: JP/KR/VN 일 100~200 RN) 설정 시 조건부 승인(B) 가능. 재무·은행 자료 보완 권고.',
       comment:'실체·공급망 검증 완료로 신뢰도 높게 봄(4/5). Deposit 커버율만 보완되면 승인 추천 가능. 초기 JP/KR/VN RN 한도부터 시작 권장.'},
     history:[{stage:'영업 1차입력',reviewer:'Global OPs',decision:'보류',comment:'서류 미비·사업자 확인 필요',date:'2026-06-28'},
-      {stage:'SCM/운영 검토',reviewer:'Global OPs',decision:'진행',comment:'폴더 자료 검토: HK BR·회사소개서 확인, 실체·엔드유저 검증 → 보류 해소',date:'2026-07-03'}] });
+      {stage:'SCM/운영 검토',reviewer:'Global OPs',decision:'진행',comment:'폴더 자료 검토: HK BR·회사소개서 확인, 실체·엔드유저 검증 → 보류 해소',date:'2026-07-03'},
+      {stage:'재무 정산검토',reviewer:'Global OPs',decision:'진행',comment:'정산조건 2주(14일)·USD 정산 합의 완료',date:'2026-07-08'}] });
   const c2 = mk({ id:'C002', name:'Linkall Travel', country:'중국(홍콩법인)', businessType:'B2B',
     market:'유럽·일본·태국', customerType:'B2B 여행사(대표 개발자 출신·24/7 CS)',
     website:'http://linkalltravel.com', bizRegNo:'70069113 (HK BR · FUNTRIP HONGKONG LIMITED)', foundedYear:2019, representative:'확인 완료(대표: 개발자 출신)',
     deposit:10000, monthlyGMV:30000, salesRegion:'유럽·일본·태국', products:'글로벌 호텔(Expedia·Hotelbeds·WebBeds)',
     scores:[4,4,3,3,2,2,5,3,2,5,4,3,5,5],
-    docs:{'사업자등록증':'제출','회사소개서':'제출','은행정보':'제출','계약서 초안':'제출','정산조건 합의서':'미제출','파트너 레퍼런스':'제출','재무제표/매출자료':'미제출','대표자 신분확인':'제출'},
+    docs:{'사업자등록증':'제출','회사소개서':'제출','은행정보':'제출','계약서 초안':'제출','정산조건 합의서':'제출','파트너 레퍼런스':'제출','재무제표/매출자료':'미제출','대표자 신분확인':'제출'},
     notes:{expect:'홍콩법인 FUNTRIP HONGKONG LIMITED(BR 70069113, 퀸즈로드센트럴 145-149) 실체 확인, 웹사이트 linkalltravel.com. 최근 연 TTV 9억 HKD(~1.15억 USD) 대규모 거래. 대표 개발자 출신(연동 2~3일), 일 5,000~6,000건 예약(일본 ~30%), 24/7 CS.',
       check:'공급사가 Expedia·Hotelbeds·WebBeds 등 대형 애그리게이터 중심 → 유니크 인벤토리·기존 채널 중복도 확인 필요. 감사 재무제표 미제출(TTV 9억 HKD는 자기신고). Deposit 커버율 0.71x 부족.',
       opinion:'홍콩법인·대규모 TTV·기술력 확인으로 점수등급 B 수준(기존 C→상향). Deposit 상향 시 승인 가능. 인벤토리 차별성·재무제표만 보완 권고.',
-      comment:'홍콩법인·9억 HKD TTV로 실체·규모 확인, 신뢰도 상향(5/5). 남은 과제는 애그리게이터 리셀 중복과 Deposit 부족 → Deposit 보완 시 승인 추천.'} });
+      comment:'홍콩법인·9억 HKD TTV로 실체·규모 확인, 신뢰도 상향(5/5). 남은 과제는 애그리게이터 리셀 중복과 Deposit 부족 → Deposit 보완 시 승인 추천.'},
+    history:[{stage:'재무 정산검토',reviewer:'Global OPs',decision:'진행',comment:'정산조건 2주(14일)·USD 정산 합의 완료',date:'2026-07-08'}] });
   const c3 = mk({ id:'C003', name:'Wingpulse (WINGSPULSE TECH)', country:'홍콩(중국계)', businessType:'B2B/TMC',
     market:'호텔 직계약+LCC 항공 (Travel Tech)', customerType:'DMC·여행사·OTA·TMC',
     website:'www.wingspulse.com / info@wingspulse.com', bizRegNo:'51588485 (HK BR)', foundedYear:2025, representative:'HE PENG(贺鹏), 단독이사',
     contact:'WingsPulse', email:'info@wingspulse.com', deposit:10000, monthlyGMV:40000, salesRegion:'동남아·한국·중국(HK·대만·마카오)', products:'역내 호텔 260+ 직계약 · LCC 항공',
     scores:[2,4,3,4,3,4,3,2,2,4,3,2,4,3], status:'검토중',
-    docs:{'사업자등록증':'제출','회사소개서':'제출','은행정보':'미제출','계약서 초안':'미제출','정산조건 합의서':'미제출','파트너 레퍼런스':'제출','재무제표/매출자료':'제출','대표자 신분확인':'미제출'},
+    docs:{'사업자등록증':'제출','회사소개서':'제출','은행정보':'미제출','계약서 초안':'미제출','정산조건 합의서':'제출','파트너 레퍼런스':'제출','재무제표/매출자료':'제출','대표자 신분확인':'미제출'},
     public:{'공식 웹사이트':'Y','LinkedIn/기업프로필':'불명','Google 검색결과':'Y','부정 뉴스':'N','소송/사기/미정산':'N','거래처/업계 레퍼런스':'Y','도메인 생성시점':'불명','회사주소 실존':'Y','대표자 업계이력':'Y'},
     documents:[{name:'사업자등록·감사 재무제표(17p)',file:'Business license wingpulse 1.pdf'},{name:'회사소개서(영문)',file:'Wing pulse intro-English 1.jpg'}],
     notes:{expect:'AI·시맨틱 태깅 기반 데이터 정확성·거래효율 중심 Travel Tech(홍콩·선전 거점). 동남아·한국·중국(홍콩·대만·마카오) 직계약 호텔 260+ 및 현지 DMC 협력, LCC 항공(NDC·100+ 항공사) dual-track. 밀리초 API·실시간 재고.',
@@ -664,7 +666,8 @@ function seed(){
       comment:'기술·260 직계약은 인상적이나 감사상 무영업이 마음에 걸려 신중(3/5). 소규모 실거래 파일럿으로 매출·정산 실적부터 확인 후 확대 권장.'},
     history:[{stage:'영업 1차입력',reviewer:'Global OPs',decision:'진행',comment:'TMC/커넥티비티 기술 파트너 후보',date:'2026-06-27'},
       {stage:'재무 정산검토',reviewer:'Global OPs',decision:'보류',comment:'폴더 자료 검토: 감사보고서상 무영업·매출0, 사명변경 → 실적 증빙까지 보류',date:'2026-07-03'},
-      {stage:'SCM/운영 검토',reviewer:'Global OPs',decision:'진행',comment:'추가정보(260+ 직계약·DMC 협력) 반영해 상향, 단 감사상 무영업과 상충 → 실거래 증빙 조건 추가확인',date:'2026-07-03'}] });
+      {stage:'SCM/운영 검토',reviewer:'Global OPs',decision:'진행',comment:'추가정보(260+ 직계약·DMC 협력) 반영해 상향, 단 감사상 무영업과 상충 → 실거래 증빙 조건 추가확인',date:'2026-07-03'},
+      {stage:'재무 정산검토',reviewer:'Global OPs',decision:'진행',comment:'정산조건 2주(14일)·USD 정산 합의 완료',date:'2026-07-08'}] });
   // Happy Travel(C004): 대표이사 컨펌 완료·진행 확정 → 리스크 게이트에서 제외(승인 완료 그래듀에이션)
   const c5 = mk({ id:'C005', name:'Ohmyhotel (오마이호텔앤코) · 자체평가', country:'싱가포르 본사(한·일·베 법인)', businessType:'B2B/B2C/SaaS',
     market:'아시아(한·일·베·태)+글로벌', customerType:'B2B 파트너 + B2C(ohmyhotel.com) 엔드유저',
