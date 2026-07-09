@@ -25,7 +25,7 @@ const GRADE_META = {
   C:{label:'추가 확인 필요', cls:'g-C'}, D:{label:'보류', cls:'g-D'}, E:{label:'거절 추천', cls:'g-E'}
 };
 const RANK = {A:0,B:1,C:2,D:3,E:4};
-const STORE_KEY = 'omh_prg_v10';
+const STORE_KEY = 'omh_prg_v12';
 
 /* ---------- state ---------- */
 let DATA = load();
@@ -623,7 +623,7 @@ function importJSON(){
   inp.click();
 }
 
-/* ---------- seed data (4 examples) ---------- */
+/* ---------- seed data (5 companies · 평가 업체 전체 기록 보존) ---------- */
 function seed(){
   const mk = (o)=> normalizeCompany(Object.assign(blankCompanyRaw(), o));
   function blankCompanyRaw(){
@@ -674,7 +674,21 @@ function seed(){
       {stage:'재무 정산검토',reviewer:'Global OPs',decision:'보류',comment:'폴더 자료 검토: 감사보고서상 무영업·매출0, 사명변경 → 실적 증빙까지 보류',date:'2026-07-03'},
       {stage:'SCM/운영 검토',reviewer:'Global OPs',decision:'진행',comment:'추가정보(260+ 직계약·DMC 협력) 반영해 상향, 단 감사상 무영업과 상충 → 실거래 증빙 조건 추가확인',date:'2026-07-03'},
       {stage:'재무 정산검토',reviewer:'Global OPs',decision:'진행',comment:'정산조건 2주(14일)·USD 정산 합의 완료',date:'2026-07-08'}] });
-  // Happy Travel(C004): 대표이사 컨펌 완료·진행 확정 → 리스크 게이트에서 제외(승인 완료 그래듀에이션)
+  // Happy Travel(C004): 대표이사 승인 완료(2026-07-06) — 평가 기록 보존 정책에 따라 승인 완료 업체도 플랫폼에 유지
+  const c4 = mk({ id:'C004', name:'Happy Travel', country:'두바이(UAE)', businessType:'B2B/TMC',
+    market:'중동', customerType:'중동 기업/여행사(태국 호텔 수요)',
+    website:'https://happytravel.example', bizRegNo:'AE-DXB-xxxxx', foundedYear:2018, representative:'확인 완료',
+    deposit:30000, monthlyGMV:60000, salesRegion:'태국', products:'태국 호텔', manualBooking:'Y', apiIntegration:'부분',
+    scores:[4,4,4,4,4,3,5,4,3,3,3,3,4,4], status:'승인',
+    notes:{expect:'중동 고객사 통한 태국 호텔 볼륨 증가 기대, Deposit USD 30,000로 상대적 견고',
+      check:'수기예약 비중·중동 정산/법무 리스크 확인 필요',
+      opinion:'종합 리스크 낮음. 초기 3개월 GMV 한도·모니터링 조건부 승인 추천 → 대표이사 승인 완료(2026-07-06).',
+      comment:'Deposit 30k로 커버율 견고, 태국 볼륨 목적 명확(4/5). 초기 3개월 모니터링 조건으로 승인 추천.'},
+    history:[
+      {stage:'영업 1차입력',reviewer:'Global OPs',decision:'진행',comment:'중동 태국호텔 볼륨 목적, Deposit 30k',date:'2026-06-25'},
+      {stage:'SCM/운영 검토',reviewer:'SCM팀',decision:'진행',comment:'엔드유저·인벤토리 적정',date:'2026-06-27'},
+      {stage:'재무 정산검토',reviewer:'재무팀',decision:'진행',comment:'커버율 1.07x, GMV 한도 조건',date:'2026-06-29'},
+      {stage:'대표이사 승인',reviewer:'대표이사',decision:'승인',comment:'대표이사 컨펌 완료·진행 확정 (초기 3개월 GMV 한도·모니터링 조건)',date:'2026-07-06'}] });
   const c5 = mk({ id:'C005', name:'Ohmyhotel (오마이호텔앤코) · 자체평가', country:'싱가포르 본사(한·일·베 법인)', businessType:'B2B/B2C/SaaS',
     market:'아시아(한·일·베·태)+글로벌', customerType:'B2B 파트너 + B2C(ohmyhotel.com) 엔드유저',
     website:'ohmyhotel.com / ohmyhotel.biz', bizRegNo:'주식회사 오마이호텔앤코 (2012 설립 · DART/나이스 조회)', foundedYear:2012, representative:'이미순 대표(前 Vicotrip)',
@@ -687,7 +701,21 @@ function seed(){
       opinion:'설립 이력·다국적 법인·직계약 인벤토리·수상 실적으로 신뢰도 최상위 → 프레임 기준 A(승인추천). 신규 파트너 평가의 벤치마크(기준선)로 활용.',
       comment:'우리 회사 자체 벤치마크. 실체·사업모델·인벤토리·성장성 최상위(5/5). Deposit/정산은 플랫폼 특성상 해당 없음.'},
     documents:[] });
-  return [c1,c2,c3,c5];
+  const c6 = mk({ id:'C006', name:'小云智能 (Xiaoyun AI · 샤오윈 AI)', country:'중국', businessType:'B2B/OTA(플랫폼)',
+    market:'중국 아웃바운드·맞춤여행(定制游)', customerType:'여행자·현지 가이드·맞춤여행 사업자(양면 AI 마켓플레이스)',
+    website:'앱·AI-SaaS 플랫폼 운영(공식 URL 자료상 미기재)', bizRegNo:'미확인(확인필요) — 실사 서류 미제출, 투자유치 피치덱(2025, 12p)만 확보', foundedYear:'', representative:'미확인(확인필요) — 핵심팀 정보 미확보',
+    contact:'Global Sales', email:'', deposit:0, monthlyGMV:0, salesRegion:'중국·글로벌(91개국·1,823개 도시)', products:'맞춤여행·가이드/현지서비스, 호텔 추천엔진(Booking·Expedia·Ctrip·道旅 연동)', apiIntegration:'Y', manualBooking:'N',
+    scores:[3,4,4,4,3,3,3,2,2,4,3,3,4,3], status:'검토중',
+    docs:{'사업자등록증':'미제출','회사소개서':'제출','은행정보':'미제출','계약서 초안':'미제출','정산조건 합의서':'미제출','파트너 레퍼런스':'제출','재무제표/매출자료':'미제출','대표자 신분확인':'미제출'},
+    public:{'공식 웹사이트':'불명','LinkedIn/기업프로필':'불명','Google 검색결과':'Y','부정 뉴스':'N','소송/사기/미정산':'N','거래처/업계 레퍼런스':'Y','도메인 생성시점':'불명','회사주소 실존':'불명','대표자 업계이력':'불명'},
+    documents:[{name:'투자유치 피치덱(중문, 12p)',file:'Xiaoyun_AI_pitch_deck_CN.pdf'},{name:'내부 요약(국문, 1p)',file:'Xiaoyun_AI_summary_KR.pdf'}],
+    notes:{expect:'AI 에이전트 기반 양면 맞춤여행 마켓플레이스("贝壳+airbnb"형). 누적 등록 가이드 108,734명(주문 수행 20,588명)·맞춤여행 사업자 20,492곳(거래 7,533곳)·91개국 1,823개 도시. 호텔 추천엔진을 운영하며 Booking·Expedia·Ctrip·道旅(Didatravel) 연동 → 오마이호텔 호텔 재고·요금의 신규 유통 채널(특히 중국 아웃바운드+맞춤여행 수요) 가능성. 노출 파트너 U-tour·CITS·飞猪·Hi Guides·샤오훙수. 맞춤여행 시장 2026~28년 4,500~6,000억 위안(비중 >20%) 성장 논리.',
+      check:'★확보 자료는 투자유치 피치덱(2025, 12p)뿐 — 사업자등록증·감사재무제표·대표자 실명·설립연도 등 실사 서류 전무. 지표(가이드·사업자 수 등)는 자기신고·미검증. 초기·펀드레이징 단계로 재무 안정성 불확실. 호텔 인벤토리는 대형 애그리게이터(Booking·Expedia·Ctrip·道旅) 리셀 → 기존 채널 중복 확인 필요. 오마이호텔과 요금·재고 연동방식(API/정적·동적)·수익모델·정산조건·Deposit·대상시장 미협의.',
+      opinion:'사업모델·기술(LLM 매트릭스·호텔 추천엔진)·성장성은 매력적이나, 실사 서류 부재로 법인 실체·재무 검증 불가 → 자동 D(보류). 다음 단계: ①사업자등록증·재무제표·대표자 확인 ②요금·재고 연동방식/수익모델/정산조건 협의 ③회사 단계·투자 상태 확인. 서류 보완 시 재평가.',
+      comment:'유통 채널로서 잠재력은 크나 실사 서류가 전혀 없어 현재는 보류(3/5). 사업자·재무·대표자 확인과 정산/연동 조건 협의 후 재평가 권장.'},
+    history:[
+      {stage:'영업 1차입력',reviewer:'Global Sales',decision:'보류',comment:'투자유치 피치덱만 확보 — 실사 서류(사업자·재무·대표자) 미비, 요금·재고 연동/정산 조건 미협의',date:'2026-07-09'}] });
+  return [c1,c2,c3,c4,c5,c6];
 }
 
 /* ---------- boot ---------- */
