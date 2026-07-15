@@ -67,7 +67,7 @@ const GRADE_META = {
   C:{label:B('추가 확인 필요','Needs further review'), cls:'g-C'}, D:{label:B('보류','On hold'), cls:'g-D'}, E:{label:B('거절 추천','Reject (recommended)'), cls:'g-E'}
 };
 const RANK = {A:0,B:1,C:2,D:3,E:4};
-const STORE_KEY = 'omh_prg_v16';
+const STORE_KEY = 'omh_prg_v17';
 const UNVERIFIED_RE = /확인필요|unverified|tbc|to be confirmed/i;
 
 /* def label/opts helpers */
@@ -813,19 +813,19 @@ function seed(){
   const c1 = mk({ id:'C001', name:'Huamao', country:B('중국(홍콩법인)','China (HK entity)'), businessType:'B2B',
     market:B('중국 아웃바운드','China outbound'), customerType:B('라이브커머스(샤오홍슈·더우인)·OTA·여행사 + B2C sub-agent','Live-commerce (Xiaohongshu·Douyin)·OTA·agencies + B2C sub-agents'),
     website:'huamaoly@163.com (B2B platform)', bizRegNo:'73809897-000-02-26-8 (HK BR) / 海南华茂 2019', foundedYear:2019, representative:B('법인 등기 확인(대표자 성명 자료 추가 요청)','Entity registration confirmed (representative full name pending)'),
-    contact:'Huamao', email:'huamaoly@163.com', deposit:12000, settlementDays:7, monthlyGMV:50000, salesRegion:B('일본·한국·베트남·글로벌','Japan·Korea·Vietnam·global'), products:B('일본·한국·베트남·글로벌 호텔','Japan·Korea·Vietnam·global hotels'),
+    contact:'Huamao', email:'huamaoly@163.com', deposit:10000, settlementDays:7, monthlyGMV:50000, salesRegion:B('일본·한국·베트남·글로벌','Japan·Korea·Vietnam·global'), products:B('일본·한국·베트남·글로벌 호텔','Japan·Korea·Vietnam·global hotels'),
     scores:[4,5,5,5,4,4,4,3,2,4,3,3,4,4], status:'review',
     docs:{bizLicense:'submitted',profile:'submitted',bank:'notSubmitted',contract:'notSubmitted',settleAgree:'submitted',refs:'submitted',financials:'notSubmitted',repId:'notSubmitted'},
     public:{website:'Y',linkedin:'unknown',google:'Y',negNews:'N',lawsuit:'N',tradeRefs:'Y',domainAge:'unknown',addrExists:'Y',repHistory:'Y'},
     documents:[{name:B('사업자등록증(홍콩 BR)','Business license (HK BR)'),file:'huamao_business license 1.pdf'},{name:B('회사소개서(15p)','Company profile (15p)'),file:'Huamao introduction file 1.pdf'}],
     notes:{expect:B('홍콩법인·하이난 본사(2019 설립) 실체 확인. 60만 호텔·직계약 2000+·연 58만 RN. B2B 주력이며 B2C 플랫폼(sub-agent)도 운영. 일본·한국·베트남은 일 100~200 RN 예측. 샤오홍슈·더우인 라이브커머스·숏폼 판매, 공급사 Hotelbeds·WebBeds·Expedia·Trip.com·Rakuten·Restel·Fliggy·Meituan 등 광범위.','HK entity / Hainan HQ (est. 2019) verified. 600k hotels, 2,000+ direct contracts, ~580k RN/yr. B2B-led, also runs a B2C platform (sub-agents). Japan·Korea·Vietnam projected at ~100-200 RN/day. Sells via Xiaohongshu·Douyin live-commerce/short-video; broad supply (Hotelbeds·WebBeds·Expedia·Trip.com·Rakuten·Restel·Fliggy·Meituan).'),
-      check:B('은행정보·계약서·재무제표 미제출. 대표자 개인 성명/신분 자료 추가 필요. ※정산조건 1주(7일)·USD 확정, Deposit $12,000로 상향 — 등급 B 요구커버율(20%) 대비 충족.','Bank details, contract and financials not submitted. Representative personal name/ID needed. *Settlement finalized at 1 week (7 days)·USD, deposit raised to $12,000 — meets grade-B required coverage (20%).'),
+      check:B('은행정보·계약서·재무제표 미제출. 대표자 개인 성명/신분 자료 추가 필요. ※정산조건 1주(7일)·USD 확정, Deposit $10,000 유지 — 등급 B 요구커버율(20%) 대비 충족.','Bank details, contract and financials not submitted. Representative personal name/ID needed. *Settlement finalized at 1 week (7 days)·USD, deposit kept at $10,000 — meets grade-B required coverage (20%).'),
       opinion:B('실체·사업모델·엔드유저·공급망 검증됨(기존 D-보류 → 상향). Deposit 상향 또는 초기 GMV 한도(예: JP/KR/VN 일 100~200 RN) 설정 시 조건부 승인(B) 가능. 재무·은행 자료 보완 권고.','Entity, business model, end-users and supply chain verified (up from prior D-hold). Conditional approval (B) feasible with a higher deposit or an initial GMV cap (e.g., JP/KR/VN 100-200 RN/day). Financial/bank docs recommended.'),
       comment:B('실체·공급망 검증 완료로 신뢰도 높게 봄(4/5). Deposit 커버율만 보완되면 승인 추천 가능. 초기 JP/KR/VN RN 한도부터 시작 권장.','Entity and supply chain verified — high confidence (4/5). Once deposit coverage is topped up, recommendable for approval. Suggest starting with JP/KR/VN RN caps.')},
     history:[{stage:'sales',reviewer:'Global OPs',decision:'hold',comment:B('서류 미비·사업자 확인 필요','Docs incomplete · business verification needed'),date:'2026-06-28'},
       {stage:'scm',reviewer:'Global OPs',decision:'proceed',comment:B('폴더 자료 검토: HK BR·회사소개서 확인, 실체·엔드유저 검증 → 보류 해소','Folder review: HK BR·company profile confirmed, entity·end-user verified → hold cleared'),date:'2026-07-03'},
       {stage:'finance',reviewer:'Global OPs',decision:'proceed',comment:B('정산조건 2주(14일)·USD 정산 합의 완료','Settlement terms agreed: 2 weeks (14 days)·USD'),date:'2026-07-08'},
-      {stage:'finance',reviewer:'Global OPs',decision:'proceed',comment:B('정산주기 1주(7일) 확정·Deposit $12,000 상향(2주→1주로 변경, 노출 축소)','Settlement cycle finalized to 1 week (7 days)·deposit raised to $12,000 (2wk→1wk, lower exposure)'),date:'2026-07-14'}] });
+      {stage:'finance',reviewer:'Global OPs',decision:'proceed',comment:B('정산주기 1주(7일) 확정(2주→1주로 변경, 노출 축소). Deposit $10,000 유지','Settlement cycle finalized to 1 week (7 days) (2wk→1wk, lower exposure). Deposit kept at $10,000'),date:'2026-07-14'}] });
   const c2 = mk({ id:'C002', name:'Linkall Travel', country:B('중국(홍콩법인)','China (HK entity)'), businessType:'B2B',
     market:B('유럽·일본·태국','Europe·Japan·Thailand'), customerType:B('B2B 여행사(대표 개발자 출신·24/7 CS)','B2B agencies (developer-founder·24/7 CS)'),
     website:'http://linkalltravel.com', bizRegNo:'70069113 (HK BR · FUNTRIP HONGKONG LIMITED)', foundedYear:2019, representative:B('확인 완료(대표: 개발자 출신)','Confirmed (founder: ex-developer)'),
