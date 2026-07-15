@@ -89,7 +89,7 @@ const I18N = {
     cardTotal:'전체 업체', cardApprove:'승인권 (최종 A·B)', cardHold:'확인·보류 (최종 C·D)', cardReject:'거절 추천 (최종 E)',
     dashHint:'※ 요약 카드와 판정은 <b>레드플래그가 반영된 ‘최종 판정’</b> 기준입니다. ‘점수등급’은 참고용이며, 레드플래그가 있으면 최종 판정이 강등됩니다(예: 점수 B라도 Deposit 부족 시 최종 C).',
     summaryTitle:'업체별 리스크 요약', copyFormatted:'📋 서식 복사',
-    thCompany:'업체', thCountry:'국가', thDeposit:'Deposit', thCoverage:'커버율', thWeighted:'가중점수',
+    thCompany:'업체', thCountry:'국가', thDeposit:'Deposit', thSettle:'정산주기', dayUnit:'일', thCoverage:'커버율', thWeighted:'가중점수',
     thScoreGrade:'점수등급', thScoreGradeSub:'(참고)', thFinal:'최종 판정', thFinalSub:'(레드플래그 반영)',
     thFlags:'레드플래그', thComment:'담당자 코멘트', thCommentSub:'(점수/5)',
     thType:'유형', thStatus:'상태',
@@ -149,7 +149,7 @@ const I18N = {
     cardTotal:'Total companies', cardApprove:'Approval tier (final A·B)', cardHold:'Review·hold (final C·D)', cardReject:'Reject (final E)',
     dashHint:'※ Summary cards and verdicts use the <b>final verdict (with red flags applied)</b>. The score grade is for reference; any red flag downgrades the final verdict (e.g., score B but insufficient deposit → final C).',
     summaryTitle:'Partner risk summary', copyFormatted:'📋 Copy formatted',
-    thCompany:'Company', thCountry:'Country', thDeposit:'Deposit', thCoverage:'Coverage', thWeighted:'Weighted score',
+    thCompany:'Company', thCountry:'Country', thDeposit:'Deposit', thSettle:'Settlement', dayUnit:'d', thCoverage:'Coverage', thWeighted:'Weighted score',
     thScoreGrade:'Score grade', thScoreGradeSub:'(reference)', thFinal:'Final verdict', thFinalSub:'(red flags applied)',
     thFlags:'Red flags', thComment:'Reviewer comment', thCommentSub:'(score/5)',
     thType:'Type', thStatus:'Status',
@@ -379,6 +379,7 @@ function viewDashboard(){
       <td><b>${esc(tt(c.name)||T('blank'))}</b><div class="hint">${esc(c.id)} · ${esc(tt(c.businessType)||'-')}</div></td>
       <td class="ctr">${esc(tt(c.country)||'-')}</td>
       <td class="num">${fmtUSD(c.deposit)}</td>
+      <td class="ctr">${Number(c.settlementDays)>0?esc(c.settlementDays)+T('dayUnit')+' · '+esc(c.currency):'—'}</td>
       <td class="ctr">${fmtCov(r.coverage)}</td>
       <td class="num">${r.weighted.toFixed(1)}</td>
       <td class="ctr">${badge(r.scoreGrade)}</td>
@@ -388,7 +389,7 @@ function viewDashboard(){
     </tr>`).join('');
   const table = list.length ? `<div class="panel"><h3 style="display:flex;align-items:center;justify-content:space-between;gap:12px">${T('summaryTitle')} <button class="btn sm" data-act="copysummary">${T('copyFormatted')}</button></h3>
     <div class="table-wrap"><table><thead><tr>
-      <th>${T('thCompany')}</th><th class="ctr">${T('thCountry')}</th><th class="num">${T('thDeposit')}</th><th class="ctr">${T('thCoverage')}</th>
+      <th>${T('thCompany')}</th><th class="ctr">${T('thCountry')}</th><th class="num">${T('thDeposit')}</th><th class="ctr">${T('thSettle')}</th><th class="ctr">${T('thCoverage')}</th>
       <th class="num">${T('thWeighted')}</th><th class="ctr">${T('thScoreGrade')}<br><span class="hint" style="font-weight:400">${T('thScoreGradeSub')}</span></th><th class="ctr">${T('thFinal')}<br><span class="hint" style="font-weight:400">${T('thFinalSub')}</span></th><th>${T('thFlags')}</th><th>${T('thComment')}<br><span class="hint" style="font-weight:400">${T('thCommentSub')}</span></th>
     </tr></thead><tbody>${rows}</tbody></table></div></div>`
     : `<div class="panel"><div class="empty">${T('noCompanies')}</div></div>`;
@@ -728,8 +729,8 @@ function fallbackRich(html, text, okMsg){
 function copySummary(){
   const clean = s => String(s==null?'':s).replace(/[\t\r\n]+/g,' ').trim();
   const cols = LANG==='en'
-    ? ['Company','Country','Deposit(USD)','Coverage','Weighted score','Score grade','Final verdict','Red flags','Reviewer comment(score)']
-    : ['업체','국가','Deposit(USD)','커버율','가중점수','점수등급','최종판정','레드플래그','담당자 코멘트(점수)'];
+    ? ['Company','Country','Deposit(USD)','Settlement','Coverage','Weighted score','Score grade','Final verdict','Red flags','Reviewer comment(score)']
+    : ['업체','국가','Deposit(USD)','정산주기','커버율','가중점수','점수등급','최종판정','레드플래그','담당자 코멘트(점수)'];
   const th = c => `<th style="border:1px solid #b9c2d0;padding:7px 10px;background:#1F4E78;color:#fff;text-align:left;white-space:nowrap">${c}</th>`;
   const td = (c,extra) => `<td style="border:1px solid #d6dce6;padding:6px 10px;vertical-align:top;${extra||''}">${c}</td>`;
   const badgeC = g => `<span style="display:inline-block;background:${gradeColor(g)};color:#fff;padding:2px 8px;border-radius:10px;font-weight:700;font-size:11px;white-space:nowrap">${g}·${esc(tt(GRADE_META[g].label))}</span>`;
@@ -744,6 +745,7 @@ function copySummary(){
       td('<b>'+esc(tt(c.name))+'</b><br><span style="color:#7a869a">'+esc(c.id)+' · '+esc(tt(c.businessType))+'</span>')+
       td(esc(tt(c.country)),'white-space:nowrap')+
       td(dep,'text-align:right;white-space:nowrap')+
+      td(Number(c.settlementDays)>0?esc(c.settlementDays+(LANG==='en'?'d':'일')+' · '+c.currency):'—','text-align:center;white-space:nowrap')+
       td(cov,'text-align:center;white-space:nowrap')+
       td(r.weighted.toFixed(1),'text-align:right')+
       td(badgeC(r.scoreGrade),'text-align:center')+
@@ -751,7 +753,7 @@ function copySummary(){
       td(esc(flags),'color:#b23b3b')+
       td('<b>'+esc(c.scores[13])+'/5</b> '+esc(tt(c.notes.comment)||''),'min-width:260px;color:#54637a')+
       '</tr>';
-    tlines.push([tt(c.name)+' ('+c.id+')', tt(c.country), dep, cov, r.weighted.toFixed(1), r.scoreGrade,
+    tlines.push([tt(c.name)+' ('+c.id+')', tt(c.country), dep, (Number(c.settlementDays)>0?c.settlementDays+(LANG==='en'?'d':'일')+' · '+c.currency:'—'), cov, r.weighted.toFixed(1), r.scoreGrade,
       r.finalGrade+'-'+tt(GRADE_META[r.finalGrade].label), flags, '('+c.scores[13]+'/5) '+(tt(c.notes.comment)||'')].map(clean).join('\t'));
   });
   html += '</tbody></table>';
