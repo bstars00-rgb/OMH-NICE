@@ -89,6 +89,7 @@ const I18N = {
     cardTotal:'전체 업체', cardApprove:'승인권 (최종 A·B)', cardHold:'확인·보류 (최종 C·D)', cardReject:'거절 추천 (최종 E)',
     dashHint:'※ 요약 카드와 판정은 <b>레드플래그가 반영된 ‘최종 판정’</b> 기준입니다. ‘점수등급’은 참고용이며, 레드플래그가 있으면 최종 판정이 강등됩니다(예: 점수 B라도 Deposit 부족 시 최종 C).',
     summaryTitle:'업체별 리스크 요약', copyFormatted:'📋 서식 복사',
+    manual:'매뉴얼', manualTitle:'오마이나이스 사용 매뉴얼',
     thCompany:'업체', thCountry:'국가', thDeposit:'Deposit', thSettle:'정산주기', dayUnit:'일', thCoverage:'커버율', thWeighted:'가중점수',
     thScoreGrade:'점수등급', thScoreGradeSub:'(참고)', thFinal:'최종 판정', thFinalSub:'(레드플래그 반영)',
     thFlags:'레드플래그', thComment:'담당자 코멘트', thCommentSub:'(점수/5)',
@@ -149,6 +150,7 @@ const I18N = {
     cardTotal:'Total companies', cardApprove:'Approval tier (final A·B)', cardHold:'Review·hold (final C·D)', cardReject:'Reject (final E)',
     dashHint:'※ Summary cards and verdicts use the <b>final verdict (with red flags applied)</b>. The score grade is for reference; any red flag downgrades the final verdict (e.g., score B but insufficient deposit → final C).',
     summaryTitle:'Partner risk summary', copyFormatted:'📋 Copy formatted',
+    manual:'Manual', manualTitle:'OMH-NICE User Manual',
     thCompany:'Company', thCountry:'Country', thDeposit:'Deposit', thSettle:'Settlement', dayUnit:'d', thCoverage:'Coverage', thWeighted:'Weighted score',
     thScoreGrade:'Score grade', thScoreGradeSub:'(reference)', thFinal:'Final verdict', thFinalSub:'(red flags applied)',
     thFlags:'Red flags', thComment:'Reviewer comment', thCommentSub:'(score/5)',
@@ -348,6 +350,9 @@ function render(){
   const [tk,sk] = titleMap[VIEW]||['',''];
   document.getElementById('page-title').textContent = tk?T(tk):'';
   document.getElementById('page-sub').textContent = sk?T(sk):'';
+  const _mbl=document.getElementById('manual-btn-label'); if(_mbl) _mbl.textContent=T('manual');
+  const _mtt=document.getElementById('manual-title'); if(_mtt) _mtt.textContent='📖 '+T('manualTitle');
+  const _mm=document.getElementById('manual-modal'); if(_mm && _mm.style.display!=='none'){ const _mb=document.getElementById('manual-body'); if(_mb) _mb.innerHTML=manualHTML(); }
 
   const acts = document.getElementById('top-actions');
   acts.innerHTML = (VIEW==='company') ? `<button class="btn" data-act="back">${T('back')}</button>` : '';
@@ -912,6 +917,87 @@ function seed(){
     history:[{stage:'sales',reviewer:'Global Sales',decision:'proceed',comment:B('신규 업체 등록 — 돌하루팡(제주페이): B2C·Direct API·Deposit USD 30k·격주 KRW 정산. 사업자등록증 확인. 예상 월거래액·계약 승인일 미정 → 검토 진행.','New partner intake — Dolharupang (Jeju Pay): B2C·Direct API·USD 30k deposit·biweekly KRW settlement. Business license verified. Expected GMV·approval date pending → proceeding to review.'),date:'2026-07-14'}] });
   return [c1,c2,c3,c4,c5,c6,c7];
 }
+
+/* ---------- 사용 매뉴얼 ---------- */
+function manualHTML(){
+  const L=(ko,en)=>LANG==='en'?en:ko;
+  const s=DATA.settings, t=s.thresholds;
+  const items = ITEM_NAMES.map((n,i)=>`<tr><td>${i+1}. ${esc(tt(n))}</td><td style="text-align:center">${s.weights[i]}</td></tr>`).join('');
+  const gRow=(g,ko,en)=>`<tr><td><span class="mbadge" style="background:${gradeColor(g)}">${g}</span></td><td>${L(ko,en)}</td></tr>`;
+  return `
+  <h4>1. ${L('오마이나이스란?','What is OMH-NICE?')}</h4>
+  <p>${L('신규 B2B/TMC 파트너의 거래 리스크를 표준 점수·등급으로 평가해, 대표이사 승인 전에 <b>승인/추가확인/보류/거절</b>을 빠르고 일관되게 판단하도록 돕는 내부 도구입니다. 공식 신용등급이 아니라 <b>내부 의사결정 보조용</b>입니다.','An internal tool that scores new B2B/TMC partners into a standard risk grade so decisions — <b>approve / check / hold / reject</b> — are fast and consistent before CEO sign-off. It is a decision aid, not an official credit rating.')}</p>
+
+  <h4>2. ${L('평가 항목 & 점수','Scoring items & points')}</h4>
+  <p>${L('담당자가 <b>14개 항목</b>을 각 <b>1~5점</b>(5=저위험/양호)으로 매깁니다. 항목마다 가중치가 다르며, 가중치 합계를 <b>100점 만점으로 정규화</b>합니다.','A reviewer rates <b>14 items</b> each <b>1–5</b> (5 = low risk/best). Items are weighted and <b>normalized to a 100-point scale</b>.')}</p>
+  <p><code>${L('가중점수 = Σ(항목점수 ÷ 5 × 가중치) ÷ 가중치합 × 100','Weighted = Σ(item ÷ 5 × weight) ÷ Σweights × 100')}</code></p>
+  <table><thead><tr><th>${L('항목','Item')}</th><th style="text-align:center;width:72px">${L('가중치','Weight')}</th></tr></thead><tbody>${items}</tbody></table>
+  <p style="color:var(--muted);font-size:12px">${L('※ ‘기존고객 중복도’는 낮을수록 높은 점수(중복 적을수록 좋음). ‘담당자 코멘트 점수’는 담당자의 종합 주관 평가입니다.','* ‘Existing-customer overlap’ scores higher when lower. ‘Reviewer comment score’ is the reviewer’s overall subjective rating.')}</p>
+
+  <h4>3. ${L('등급 기준','Grade thresholds')}</h4>
+  <table><thead><tr><th style="width:64px">${L('등급','Grade')}</th><th>${L('가중점수 / 의미','Weighted score / meaning')}</th></tr></thead><tbody>
+    ${gRow('A',`≥ ${t.A} · 승인 추천`,`≥ ${t.A} · Approve`)}
+    ${gRow('B',`≥ ${t.B} · 조건부 승인`,`≥ ${t.B} · Conditional`)}
+    ${gRow('C',`≥ ${t.C} · 추가 확인 필요`,`≥ ${t.C} · Needs check`)}
+    ${gRow('D',`≥ ${t.D} · 보류`,`≥ ${t.D} · Hold`)}
+    ${gRow('E',`< ${t.D} · 거절 추천`,`< ${t.D} · Reject`)}
+  </tbody></table>
+
+  <h4>4. ${L('레드플래그 — 자동 강등','Red flags — automatic downgrade')}</h4>
+  <p>${L('점수가 좋아도 아래에 걸리면 <b>최종 판정이 강등</b>됩니다. <b>최종 판정 = min(점수등급, 레드플래그 상한)</b>.','Even with a good score, these <b>downgrade the final verdict</b>. <b>Final = min(score grade, red-flag cap)</b>.')}</p>
+  <p><b>${L('자동 D-보류','Auto D — Hold')}</b></p>
+  <ul>
+    <li>${L('사업자·실체 확인 불가','Business entity unverifiable')}</li>
+    <li>${L('회사주소 실존 확인 불가','Company address not verifiable')}</li>
+    <li>${L('부정 뉴스 발견','Negative news found')}</li>
+    <li>${L('소송/사기/미정산 이슈','Lawsuit / fraud / non-settlement issue')}</li>
+    <li>${L('Deposit 없이 Credit 요청','Credit requested with no deposit')}</li>
+  </ul>
+  <p><b>${L('자동 C-추가확인','Auto C — Needs check')}</b></p>
+  <ul>
+    <li>${L('웹사이트 없음/미확인','No/unverified website')}</li>
+    <li>${L('대표자 정보 확인 불가','Representative not verifiable')}</li>
+    <li>${L('Deposit 부족(등급별 요구커버율 미달)','Deposit short (below required coverage)')}</li>
+    <li>${L('정산주기 30일 이상','Settlement cycle ≥ 30 days')}</li>
+  </ul>
+
+  <h4>5. ${L('Deposit(보증금) 판정 — 신용도 기반','Deposit assessment — credit-based')}</h4>
+  <p>${L('Deposit은 노출 전액을 담보하지 않고 <b>신용도(등급)</b>에 따라 요구량이 달라집니다. 대형·고신뢰 파트너는 오픈 크레딧으로 Deposit이 낮거나 0입니다.','Deposit does not cover full exposure; the requirement scales with <b>credit (grade)</b>. Large, trusted partners trade on open credit with little/no deposit.')}</p>
+  <p><code>${L('정산주기 노출액 = 예상 월거래액 × 정산주기 ÷ 30','Cycle exposure = monthly volume × settlement ÷ 30')}</code><br>
+  <code>${L('필요 Deposit = 노출액 × 등급별 요구커버율','Required deposit = exposure × required coverage')}</code></p>
+  <table><thead><tr><th style="width:64px">${L('등급','Grade')}</th><th>${L('요구커버율','Required coverage')}</th></tr></thead><tbody>
+    <tr><td>A</td><td>0% (${L('오픈 크레딧','open credit')})</td></tr>
+    <tr><td>B</td><td>20%</td></tr>
+    <tr><td>C</td><td>50%</td></tr>
+    <tr><td>D · E</td><td>100% (${L('전액/선입금','full/prepay')})</td></tr>
+  </tbody></table>
+  <p style="color:var(--muted);font-size:12px">${L('예: 등급 B·월 $50,000·정산 1주 → 노출 $11,667 × 20% = 필요 Deposit 약 $2,333. 현재 Deposit이 이보다 많으면 ‘충족’.','E.g. B · $50k/mo · 1-week → exposure $11,667 × 20% = ~$2,333 required. If current deposit exceeds it → ‘sufficient’.')}</p>
+
+  <h4>6. ${L('사용 흐름','How to use')}</h4>
+  <ul>
+    <li>${L('① <code>Document</code> 폴더에 업체 자료(사업자등록·소개서 등) 업로드','① Upload partner files (license, profile…) into the <code>Document</code> folder')}</li>
+    <li>${L('② 업체 상세에서 13개 항목 + 담당자 코멘트 입력','② Enter the 13 items + reviewer comment in the company detail')}</li>
+    <li>${L('③ 가중점수·최종판정 자동 산출(레드플래그 반영)','③ Weighted score & final verdict auto-computed (with red flags)')}</li>
+    <li>${L('④ 승인 요청서 자동 생성·인쇄/PDF로 대표이사 보고','④ Auto-generate the approval report; print/PDF for the CEO')}</li>
+    <li>${L('⑤ 승인 이력에 단계별 결정 기록','⑤ Log stage decisions in the approval history')}</li>
+  </ul>
+
+  <h4>7. ${L('유의사항','Notes')}</h4>
+  <ul>
+    <li>${L('요약 카드·판정은 <b>최종 판정</b> 기준(점수등급은 참고).','Summary cards/verdict use the <b>final verdict</b> (score grade is reference).')}</li>
+    <li>${L('가중치·임계값은 <b>설정</b> 화면에서 조정 가능.','Weights/thresholds are adjustable in <b>Settings</b>.')}</li>
+    <li>${L('데이터는 접속한 브라우저에 저장됩니다(localStorage). 공유는 서식 복사/보고서 활용.','Data is stored in your browser (localStorage). Share via formatted copy/report.')}</li>
+  </ul>`;
+}
+(function(){
+  const btn=document.getElementById('manual-btn'), modal=document.getElementById('manual-modal'), closeB=document.getElementById('manual-close');
+  const open=()=>{ document.getElementById('manual-body').innerHTML=manualHTML(); modal.style.display='flex'; };
+  const hide=()=>{ modal.style.display='none'; };
+  if(btn) btn.addEventListener('click', open);
+  if(closeB) closeB.addEventListener('click', hide);
+  if(modal) modal.addEventListener('click', e=>{ if(e.target===modal) hide(); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') hide(); });
+})();
 
 /* ---------- boot ---------- */
 render();

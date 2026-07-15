@@ -34,10 +34,22 @@
         <h2 id="page-title">대시보드</h2>
         <div class="sub" id="page-sub">신규 B2B/TMC 파트너 리스크 표준 평가</div>
       </div>
-      <div class="row-actions" id="top-actions"></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="row-actions" id="top-actions"></div>
+        <button class="btn primary" id="manual-btn" title="매뉴얼">📖 <span id="manual-btn-label">매뉴얼</span></button>
+      </div>
     </div>
     <div class="content" id="content"></div>
   </main>
+</div>
+<div id="manual-modal" class="modal-overlay no-print" style="display:none">
+  <div class="modal-card">
+    <div class="modal-head">
+      <span id="manual-title">📖 오마이나이스 사용 매뉴얼</span>
+      <button class="btn sm" id="manual-close" aria-label="close">✕</button>
+    </div>
+    <div class="modal-body" id="manual-body"></div>
+  </div>
 </div>
 <script src="app.js"></script>
 </body>
