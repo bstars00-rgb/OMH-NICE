@@ -10,16 +10,21 @@
 <div class="app">
   <aside class="sidebar no-print">
     <div class="brand">
-      <h1>오마이나이스</h1>
-      <p>OMH-NICE · 파트너 거래 리스크 평가</p>
+      <h1 id="brand-title">오마이나이스</h1>
+      <p id="brand-sub">OMH-NICE · 파트너 거래 리스크 평가</p>
+      <div id="lang-toggle" style="margin-top:9px;font-size:12px;display:flex;gap:8px;align-items:center">
+        <button type="button" data-lang="ko" style="background:none;border:0;padding:0;cursor:pointer;color:inherit;font:inherit">한국어</button>
+        <span style="opacity:.4">·</span>
+        <button type="button" data-lang="en" style="background:none;border:0;padding:0;cursor:pointer;color:inherit;font:inherit">EN</button>
+      </div>
     </div>
     <nav class="nav" id="nav">
-      <a data-view="dashboard"><span class="ico">▦</span> 대시보드</a>
-      <a data-view="companies"><span class="ico">▤</span> 업체 목록</a>
-      <a data-view="settings"><span class="ico">⚙</span> 설정(가중치)</a>
+      <a data-view="dashboard"><span class="ico">▦</span> <span data-navlabel>대시보드</span></a>
+      <a data-view="companies"><span class="ico">▤</span> <span data-navlabel>업체 목록</span></a>
+      <a data-view="settings"><span class="ico">⚙</span> <span data-navlabel>설정(가중치)</span></a>
     </nav>
     <div class="foot">
-      MVP 프로토타입 · 데이터는 브라우저에 저장됩니다<br>
+      <span id="foot-note">MVP 프로토타입 · 데이터는 브라우저에 저장됩니다</span><br>
       <span id="foot-count"></span>
     </div>
   </aside>
