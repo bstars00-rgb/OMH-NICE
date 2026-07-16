@@ -67,7 +67,7 @@ const GRADE_META = {
   C:{label:B('추가 확인 필요','Needs further review'), cls:'g-C'}, D:{label:B('보류','On hold'), cls:'g-D'}, E:{label:B('거절 추천','Reject (recommended)'), cls:'g-E'}
 };
 const RANK = {A:0,B:1,C:2,D:3,E:4};
-const STORE_KEY = 'omh_prg_v20';
+const STORE_KEY = 'omh_prg_v21';
 const UNVERIFIED_RE = /확인필요|unverified|tbc|to be confirmed/i;
 
 /* def label/opts helpers */
@@ -907,7 +907,7 @@ function seed(){
     website:B('www.dolharupang.com','www.dolharupang.com'), bizRegNo:B('사업자등록증 제출·확인(주식회사 제주페이)','Business license submitted·verified (Jeju Pay Inc.)'), foundedYear:2012, representative:B('사업자등록증 상 대표자 확인','Representative per business license'),
     contact:'Global Sales', email:'', deposit:30000, settlementDays:14, currency:'KRW', creditRequired:'N', monthlyGMV:0, salesRegion:B('한국(KR)','Korea (KR)'), products:B('제주 항공권·렌트카·숙소·여행티켓 통합 B2C','Jeju air·car·hotel·ticket integrated B2C'), apiIntegration:'Y', manualBooking:'N', cancelNoshowRisk:'low',
     scores:[4,4,5,4,4,3,4,3,4,4,4,4,4,4], status:'review',
-    docs:{bizLicense:'submitted',profile:'submitted',bank:'notSubmitted',contract:'notSubmitted',settleAgree:'notSubmitted',refs:'submitted',financials:'notSubmitted',repId:'notSubmitted'},
+    docs:{bizLicense:'submitted',profile:'submitted',bank:'notSubmitted',contract:'notSubmitted',settleAgree:'notSubmitted',refs:'submitted',financials:'notSubmitted',repId:'submitted'},
     public:{website:'Y',linkedin:'unknown',google:'Y',negNews:'N',lawsuit:'N',tradeRefs:'unknown',domainAge:'unknown',addrExists:'Y',repHistory:'unknown'},
     documents:[{name:B('사업자등록증(주식회사 제주페이)','Business license (Jeju Pay Inc.)'),file:'제주페이_사업자등록증_25.09.10 (5).pdf'},{name:B('회사소개서(2025)','Company profile (2025)'),file:'2025_회사소개서.pdf'}],
     notes:{expect:B('제주 최대규모 B2C 여행 예약·가격비교 플랫폼 "돌하루팡"(주식회사 제주페이) — 2012 설립(13년 업력), "국내최초 제주 가격비교" No.1. 제주 항공권·렌트카·숙소·여행티켓 통합. 누적 이용 고객 약 930만 명, 자체 앱(iOS·Android)·네이버페이 연동, 여행 인플루언서 마케팅 활발. 제주공식 우수관광사업체·착한기업 인증. Direct API로 오마이호텔 제주·국내 호텔 재고의 대형 국내 B2C 유통 채널 가능. Deposit USD 30,000(견고), 격주(2주) 정산·통화 KRW.','Largest Jeju B2C travel booking·price-comparison platform "Dolharupang" (Jeju Pay Inc.) — founded 2012 (13 yrs), "Korea-first Jeju price comparison", No.1. Integrates Jeju air·car rental·hotels·tickets. ~9.3M cumulative customers, own apps (iOS·Android)·NaverPay, active influencer marketing. Certified Jeju official tourism operator. Via Direct API, a large domestic B2C distribution channel for Ohmyhotel Jeju·domestic hotel inventory. Deposit USD 30,000 (solid), biweekly settlement in KRW.'),
@@ -915,7 +915,8 @@ function seed(){
       opinion:B('2012 설립·누적 930만 고객·제주 1등 규모가 확인되어 C→B 상향(78점대). B·조건부 승인. 조건: 계약·정산조건 확정, 초기 GMV 한도 설정, 초기 3개월 모니터링, 환처리 방식 합의. 재무제표 확보 시 신뢰도 추가 상향 여지.','Verified 2012 founding·9.3M cumulative customers·#1 in Jeju → upgraded C→B (~78). B, conditional approval. Conditions: finalize contract·settlement terms, set initial GMV cap, 3-month monitoring, agree FX handling. Room for further upgrade once financials are provided.'),
       comment:B('회사소개서로 실체·규모(930만 고객·13년) 확인 → 신뢰도·엔드유저 대폭 상향(4/5). 계약·정산·GMV 확정 시 조건부 승인 권고.','Company profile confirms entity·scale (9.3M customers·13 yrs) → credibility·end-user sharply up (4/5). Recommend conditional approval once contract·settlement·GMV are finalized.')},
     history:[{stage:'sales',reviewer:'Global Sales',decision:'proceed',comment:B('신규 업체 등록 — 돌하루팡(제주페이): B2C·Direct API·Deposit USD 30k·격주 KRW 정산. 사업자등록증 확인. 예상 월거래액·계약 승인일 미정 → 검토 진행.','New partner intake — Dolharupang (Jeju Pay): B2C·Direct API·USD 30k deposit·biweekly KRW settlement. Business license verified. Expected GMV·approval date pending → proceeding to review.'),date:'2026-07-14'},
-      {stage:'scm',reviewer:'Global OPs',decision:'proceed',comment:B('회사소개서(2025) 검토: 2012 설립·제주 1등·누적 930만 고객·앱/네이버페이·우수관광사업체 확인 → 실체·규모 검증, C→B 상향. 계약·정산·GMV 확정 조건.','Company profile (2025) review: est. 2012·#1 in Jeju·9.3M cumulative customers·app/NaverPay·certified operator → entity·scale verified, C→B. Pending contract·settlement·GMV.'),date:'2026-07-14'}] });
+      {stage:'scm',reviewer:'Global OPs',decision:'proceed',comment:B('회사소개서(2025) 검토: 2012 설립·제주 1등·누적 930만 고객·앱/네이버페이·우수관광사업체 확인 → 실체·규모 검증, C→B 상향. 계약·정산·GMV 확정 조건.','Company profile (2025) review: est. 2012·#1 in Jeju·9.3M cumulative customers·app/NaverPay·certified operator → entity·scale verified, C→B. Pending contract·settlement·GMV.'),date:'2026-07-14'},
+      {stage:'sales',reviewer:'Global OPs',decision:'proceed',comment:B('대표자 신분확인 서류 제출 완료','Representative ID verification submitted'),date:'2026-07-14'}] });
   return [c1,c2,c3,c4,c5,c6,c7];
 }
 
