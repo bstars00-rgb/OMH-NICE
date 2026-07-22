@@ -67,7 +67,7 @@ const GRADE_META = {
   C:{label:B('추가 확인 필요','Needs further review'), cls:'g-C'}, D:{label:B('보류','On hold'), cls:'g-D'}, E:{label:B('거절 추천','Reject (recommended)'), cls:'g-E'}
 };
 const RANK = {A:0,B:1,C:2,D:3,E:4};
-const STORE_KEY = 'omh_prg_v23';
+const STORE_KEY = 'omh_prg_v24';
 const UNVERIFIED_RE = /확인필요|unverified|tbc|to be confirmed/i;
 
 /* def label/opts helpers */
@@ -918,7 +918,20 @@ function seed(){
       comment:B('회사소개서로 실체·규모(930만 고객·13년) 확인 → 신뢰도·엔드유저 대폭 상향(4/5). 계약·정산·GMV 확정 시 조건부 승인 권고.','Company profile confirms entity·scale (9.3M customers·13 yrs) → credibility·end-user sharply up (4/5). Recommend conditional approval once contract·settlement·GMV are finalized.')},
     history:[{stage:'sales',reviewer:'Global Sales',decision:'proceed',comment:B('신규 업체 등록 — 돌하루팡(제주페이): B2C·Direct API·Deposit USD 30k·격주 KRW 정산. 사업자등록증 확인. 예상 월거래액·계약 승인일 미정 → 검토 진행.','New partner intake — Dolharupang (Jeju Pay): B2C·Direct API·USD 30k deposit·biweekly KRW settlement. Business license verified. Expected GMV·approval date pending → proceeding to review.'),date:'2026-07-14'},
       {stage:'scm',reviewer:'Global OPs',decision:'proceed',comment:B('회사소개서(2025) 검토: 2012 설립·제주 1등·누적 930만 고객·앱/네이버페이·우수관광사업체 확인 → 실체·규모 검증, C→B 상향. 계약·정산·GMV 확정 조건.','Company profile (2025) review: est. 2012·#1 in Jeju·9.3M cumulative customers·app/NaverPay·certified operator → entity·scale verified, C→B. Pending contract·settlement·GMV.'),date:'2026-07-14'}] });
-  return [c1,c2,c3,c4,c5,c6,c7];
+  const c8 = mk({ id:'C008', name:B('Asiarooms (주식회사 제이알홀딩스)','Asiarooms (JR Holdings Inc.)'), country:B('한국(본사)·베트남 사무소','Korea (HQ)·Vietnam office'), businessType:B('B2B 호텔 공급사(Wholesaler)','B2B hotel supplier (wholesaler)'),
+    market:B('베트남·일본·한국·SEA 호텔 인벤토리 공급','Vietnam·Japan·Korea·SEA hotel inventory supply'), customerType:B('OTA·B2B 플랫폼·여행사(공급 대상)','OTAs·B2B platforms·agencies (supply side)'),
+    website:B('www.asiarooms.ai','www.asiarooms.ai'), bizRegNo:B('268-88-03052 (주식회사 제이알홀딩스 · 국세청 확인)','268-88-03052 (JR Holdings Inc. · NTS-verified)'), foundedYear:2023, representative:B('정길원 (단독대표)','Jung Gil-won (sole representative)'),
+    contact:'Asiarooms Sales', email:'sales2@asiarooms.ai', deposit:0, settlementDays:14, currency:'USD', creditRequired:'N', monthlyGMV:0, salesRegion:B('베트남·일본·한국·동남아','Vietnam·Japan·Korea·SE Asia'), products:B('호텔 인벤토리 공급(베트남 500+ 직계약·일본 독점 500+·한국 300+·SEA 20,000+)','Hotel inventory supply (Vietnam 500+ direct·Japan 500+ exclusive·Korea 300+·SEA 20,000+)'), apiIntegration:'Y', manualBooking:'N', cancelNoshowRisk:'low',
+    scores:[3,4,3,4,4,5,4,3,3,5,4,4,4,4], status:'review',
+    docs:{bizLicense:'submitted',profile:'submitted',bank:'notSubmitted',contract:'notSubmitted',settleAgree:'notSubmitted',refs:'notSubmitted',financials:'notSubmitted',repId:'notSubmitted'},
+    public:{website:'Y',linkedin:'unknown',google:'Y',negNews:'N',lawsuit:'N',tradeRefs:'unknown',domainAge:'unknown',addrExists:'Y',repHistory:'unknown'},
+    documents:[{name:B('사업자등록증(주식회사 제이알홀딩스)','Business license (JR Holdings Inc.)'),file:'JR holdings 사업자 등록증 revised.pdf'},{name:B('회사소개서(Asiarooms)','Company profile (Asiarooms)'),file:'Asiarooms_Company_Profile.pptx'}],
+    notes:{expect:B('아시아 B2B 호텔 유통·공급 플랫폼 Asiarooms(운영 주식회사 제이알홀딩스, 대표 정길원). 2023 설립·2025 정식 운영, 한국 본사(경기 부천)·베트남 사무소·24/7. 공급 인벤토리: 베트남 500+ 직계약(연말 1,000 목표, 정적·동적 요금, 3-5성·풀빌라·리조트), 일본 독점 500+(OTA 미노출 hidden), 한국 300+(서울·부산·제주·경주·인천), SEA 20,000+. 룸매핑·콘텐츠 정제 강점, API Pull/Push/Switch. 오마이호텔에 인벤토리 공급 희망(상호 크로스셀 가능).','Asia B2B hotel distribution·supply platform Asiarooms (operator JR Holdings Inc., rep. Jung Gil-won). Founded 2023, full ops since 2025; Korea HQ (Bucheon)·Vietnam office·24/7. Supply inventory: Vietnam 500+ direct (target 1,000 by year-end; static·dynamic; 3-5-star·pool villas·resorts), Japan 500+ exclusive (hidden, not on OTAs), Korea 300+ (Seoul·Busan·Jeju·Gyeongju·Incheon), SEA 20,000+. Strong room-mapping·content, API Pull/Push/Switch. Wants to supply inventory to Ohmyhotel (cross-sell possible).'),
+      check:B('★공급사(정산 방향 반대 — OMH가 예약분 지급) → Deposit 개념 비해당. 2023 설립·2025 정식운영으로 트랙레코드 짧음. 정산조건·수수료(net/commission)·환불·오버부킹 정책 미협의. 인벤토리 요금 경쟁력·실 allotment·재무상태 실사 필요(재무제표·은행정보 미제출). 베트남 직계약·일본 독점 주장은 계약 리스트로 검증.','★Supplier (settlement reversed — Ohmyhotel pays for bookings) → deposit N/A. Short track record (founded 2023, full ops 2025). Settlement terms·commission (net/commission)·refund·overbooking policy not agreed. Verify rate competitiveness·real allotment·financials (financials·bank not submitted). Validate Vietnam-direct·Japan-exclusive claims with contract lists.'),
+      opinion:B('베트남 직계약·일본 독점 등 유니크 인벤토리와 기술(룸매핑·다중 API)로 공급사로서 매력 큼 → B(조건부 승인). 조건: 요금 경쟁력·allotment 실측 파일럿, 정산/수수료/오버부킹 정책 합의, 실사(재무·계약 증빙). 한국·베트남·일본은 OMH 핵심시장과 정합.','Unique inventory (Vietnam-direct·Japan-exclusive) and tech (room mapping·multi-API) make it an attractive supplier → B (conditional approval). Conditions: pilot to measure rate competitiveness·allotment, agree settlement/commission/overbooking policy, due diligence (financials·contracts). Korea·Vietnam·Japan align with OMH core markets.'),
+      comment:B('유니크 공급(베트남 직계약·일본 hidden)·기술 강점으로 우수 공급사 후보(4/5). 요금·allotment 파일럿과 정산정책 합의 후 승인 권고.','Strong supplier candidate given unique supply (Vietnam-direct·Japan-hidden) and tech (4/5). Recommend approval after a rate·allotment pilot and settlement-policy agreement.')},
+    history:[{stage:'sales',reviewer:'Global Sales',decision:'proceed',comment:B('신규 공급사 등록 — Asiarooms(JR Holdings Inc., 사업자 268-88-03052, 대표 정길원). 베트남 500+ 직계약·일본 독점·한국 300+·SEA 20,000+ 인벤토리 공급 희망, API Pull/Push/Switch. 정산/요금/실사 협의 예정.','New supplier intake — Asiarooms (JR Holdings Inc., biz-reg 268-88-03052, rep. Jung Gil-won). Wants to supply Vietnam 500+ direct·Japan exclusive·Korea 300+·SEA 20,000+ inventory, API Pull/Push/Switch. Settlement/rate/DD to be discussed.'),date:'2026-07-17'}] });
+  return [c1,c2,c3,c4,c5,c6,c7,c8];
 }
 
 /* ---------- 사용 매뉴얼 ---------- */
