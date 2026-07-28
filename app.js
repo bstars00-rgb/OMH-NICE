@@ -24,7 +24,15 @@ const ITEM_NAMES = [
   B('장기 성장성','Long-term growth'), B('담당자 코멘트 점수','Reviewer comment score')];
 const DEFAULT_WEIGHTS = [12,8,8,6,6,6,8,12,12,6,5,6,5,10];
 const DEFAULT_THRESHOLDS = { A:85, B:70, C:55, D:40 };
-const REQUIRED_COVERAGE = { A:0, B:0.2, C:0.5, D:1, E:1 };
+// 점수 기반 차등 Deposit·정산주기 권장(대표이사 방침): 높은 점수=완화, 낮은 점수=강화
+const TERM_TIERS = [
+  { min:80, deposit:10000, days:14 },  // ≥80: 만불 / 2주
+  { min:75, deposit:10000, days:7 },   // 75~79: 만불 / 1주
+  { min:70, deposit:30000, days:14 },  // 70~74: 3만불 / 2주
+  { min:0,  deposit:30000, days:7 }    // <70: 3만불 / 1주
+];
+function recommendTerms(score){ for(var i=0;i<TERM_TIERS.length;i++){ if(score>=TERM_TIERS[i].min) return {deposit:TERM_TIERS[i].deposit, days:TERM_TIERS[i].days}; } return {deposit:30000, days:7}; }
+function weekLabel(days){ return days===7?(LANG==='en'?'1wk':'1주'):days===14?(LANG==='en'?'2wk':'2주'):days+(LANG==='en'?'d':'일'); }
 
 const DOC_DEFS = [
   {id:'bizLicense', ko:'사업자등록증', en:'Business license'},
@@ -297,9 +305,8 @@ function compute(c){
   const uncoveredCredit = c.creditRequired==='Y' && dep===0;
   const websiteNo = c.public['website']==='N' || fieldMissing(c.website);
   const repMissing = fieldMissing(c.representative);
-  const reqCov = (scoreGrade in REQUIRED_COVERAGE) ? REQUIRED_COVERAGE[scoreGrade] : 1;
-  const requiredDeposit = exposure * reqCov;
-  const depositShort = exposure>0 && reqCov>0 && dep < requiredDeposit - 1e-6;
+  const rec = recommendTerms(weighted);
+  const termsMismatch = (dep < rec.deposit) || (days > rec.days);
   const slowSettle = days>=30;
 
   const dFlags=[], cFlags=[];
@@ -310,7 +317,6 @@ function compute(c){
   if(uncoveredCredit) dFlags.push(tt(FLAG_TXT.uncoveredCredit));
   if(websiteNo) cFlags.push(tt(FLAG_TXT.websiteNo));
   if(repMissing) cFlags.push(tt(FLAG_TXT.repMissing));
-  if(depositShort) cFlags.push(depositShortFlag(requiredDeposit));
   if(slowSettle) cFlags.push(tt(FLAG_TXT.slowSettle));
 
   let rank = RANK[scoreGrade];
@@ -319,7 +325,7 @@ function compute(c){
   const finalGrade = Object.keys(RANK).find(k=>RANK[k]===rank);
 
   return { exposure, coverage, hasCov, weighted, scoreGrade, finalGrade, dFlags, cFlags,
-           reqCov, requiredDeposit, depositShort,
+           recDeposit:rec.deposit, recDays:rec.days, termsMismatch,
            allFlags:[...dFlags, ...cFlags] };
 }
 
@@ -385,7 +391,7 @@ function viewDashboard(){
       <td class="ctr">${esc(tt(c.country)||'-')}</td>
       <td class="num">${fmtUSD(c.deposit)}</td>
       <td class="ctr">${Number(c.settlementDays)>0?esc(c.settlementDays)+T('dayUnit')+' · '+esc(c.currency):'—'}</td>
-      <td class="ctr">${fmtCov(r.coverage)}</td>
+      <td class="ctr" style="white-space:nowrap;${r.termsMismatch?'color:var(--gC);font-weight:600':''}">$${r.recDeposit/1000}k · ${weekLabel(r.recDays)}${r.termsMismatch?' ⚠':''}</td>
       <td class="num">${r.weighted.toFixed(1)}</td>
       <td class="ctr">${badge(r.scoreGrade)}</td>
       <td class="ctr">${badge(r.finalGrade)}</td>
@@ -394,7 +400,7 @@ function viewDashboard(){
     </tr>`).join('');
   const table = list.length ? `<div class="panel"><h3 style="display:flex;align-items:center;justify-content:space-between;gap:12px">${T('summaryTitle')} <button class="btn sm" data-act="copysummary">${T('copyFormatted')}</button></h3>
     <div class="table-wrap"><table><thead><tr>
-      <th>${T('thCompany')}</th><th class="ctr">${T('thCountry')}</th><th class="num">${T('thDeposit')}</th><th class="ctr">${T('thSettle')}</th><th class="ctr">${T('thCoverage')}</th>
+      <th>${T('thCompany')}</th><th class="ctr">${T('thCountry')}</th><th class="num">${T('thDeposit')}</th><th class="ctr">${T('thSettle')}</th><th class="ctr">${LANG==='en'?'Rec. terms':'권장조건'}<br><span class="hint" style="font-weight:400">${LANG==='en'?'by score':'점수기반'}</span></th>
       <th class="num">${T('thWeighted')}</th><th class="ctr">${T('thScoreGrade')}<br><span class="hint" style="font-weight:400">${T('thScoreGradeSub')}</span></th><th class="ctr">${T('thFinal')}<br><span class="hint" style="font-weight:400">${T('thFinalSub')}</span></th><th>${T('thFlags')}</th><th>${T('thComment')}<br><span class="hint" style="font-weight:400">${T('thCommentSub')}</span></th>
     </tr></thead><tbody>${rows}</tbody></table></div></div>`
     : `<div class="panel"><div class="empty">${T('noCompanies')}</div></div>`;
@@ -506,9 +512,9 @@ function tabDeal(c){
     ${selDefs(T('fCancelRisk'),'cancelNoshowRisk',c.cancelNoshowRisk,RISK_DEFS)}
   </div>
   <div class="result" style="margin-top:18px">
-    <div class="box"><div class="k">${T('boxExposure')}</div><div class="v">${fmtUSD(r.exposure)}</div><div class="hint">${T('boxExposureHint')}</div></div>
-    <div class="box"><div class="k">${T('boxReqDep')} (${LANG==='en'?'grade':'등급'} ${r.scoreGrade}·${Math.round(r.reqCov*100)}%)</div><div class="v">${fmtUSD(r.requiredDeposit)}</div><div class="hint">${T('boxReqDepHint')}</div></div>
-    <div class="box"><div class="k">${T('boxDepOk')}</div><div class="v" style="color:${r.depositShort?'var(--gE)':'var(--gA)'}">${r.exposure>0?(r.depositShort?T('boxShort'):T('boxSufficient')):'—'}</div><div class="hint">${T('boxCurrent')} ${fmtUSD(c.deposit)} · ${T('thCoverage')} ${fmtCov(r.coverage)}</div></div>
+    <div class="box"><div class="k">${LANG==='en'?'Recommended deposit':'권장 Deposit'} <span class="hint">(${LANG==='en'?'score':'점수'} ${r.weighted.toFixed(1)})</span></div><div class="v">${fmtUSD(r.recDeposit)}</div><div class="hint">${LANG==='en'?'Current':'현재'} ${fmtUSD(c.deposit)}</div></div>
+    <div class="box"><div class="k">${LANG==='en'?'Recommended settlement':'권장 정산주기'}</div><div class="v">${weekLabel(r.recDays)}</div><div class="hint">${LANG==='en'?'Current':'현재'} ${weekLabel(Number(c.settlementDays))}</div></div>
+    <div class="box"><div class="k">${LANG==='en'?'Terms status':'조건 상태'}</div><div class="v" style="color:${r.termsMismatch?'var(--gC)':'var(--gA)'}">${r.termsMismatch?(LANG==='en'?'Renegotiate':'재협의 권장'):(LANG==='en'?'Meets policy':'권장 부합')}</div><div class="hint">${LANG==='en'?'Score-tiered policy':'점수 기반 차등 정책'}</div></div>
   </div></div></div>`;
 }
 function tabDocs(c){
@@ -579,6 +585,7 @@ function tabReport(c,r){
         ${row(T('rFoundedRep'), esc(tt(c.foundedYear)||'-')+' / '+esc(tt(c.representative)||'-'))}
         ${row(T('rDeposit'), fmtUSD(c.deposit)+' ('+esc(c.currency)+')')}
         ${row(T('rSettle'), esc(c.settlementDays)+' '+T('rDays'))}
+        ${row(LANG==='en'?'Recommended terms (by score)':'권장 거래조건(점수기반)', 'Deposit '+fmtUSD(r.recDeposit)+' / '+weekLabel(r.recDays)+(r.termsMismatch?(LANG==='en'?' — renegotiate (differs from current)':' — 재협의 권장(현재와 다름)'):(LANG==='en'?' — meets policy':' — 권장 부합')))}
         ${row(T('rGMV'), fmtUSD(c.monthlyGMV)+' · '+T('rCoverage')+' '+fmtCov(r.coverage))}
         ${row(T('rProducts'), esc(tt(c.products)||'-'))}
         ${row(T('rApiManual'), esc(defLabel(YNP_DEFS,c.apiIntegration))+' / '+esc(defLabel(MANUAL_DEFS,c.manualBooking)))}
@@ -734,8 +741,8 @@ function fallbackRich(html, text, okMsg){
 function copySummary(){
   const clean = s => String(s==null?'':s).replace(/[\t\r\n]+/g,' ').trim();
   const cols = LANG==='en'
-    ? ['Company','Country','Deposit(USD)','Settlement','Coverage','Weighted score','Score grade','Final verdict','Red flags','Reviewer comment(score)']
-    : ['업체','국가','Deposit(USD)','정산주기','커버율','가중점수','점수등급','최종판정','레드플래그','담당자 코멘트(점수)'];
+    ? ['Company','Country','Deposit(USD)','Settlement','Rec. terms','Weighted score','Score grade','Final verdict','Red flags','Reviewer comment(score)']
+    : ['업체','국가','Deposit(USD)','정산주기','권장조건','가중점수','점수등급','최종판정','레드플래그','담당자 코멘트(점수)'];
   const th = c => `<th style="border:1px solid #b9c2d0;padding:7px 10px;background:#1F4E78;color:#fff;text-align:left;white-space:nowrap">${c}</th>`;
   const td = (c,extra) => `<td style="border:1px solid #d6dce6;padding:6px 10px;vertical-align:top;${extra||''}">${c}</td>`;
   const badgeC = g => `<span style="display:inline-block;background:${gradeColor(g)};color:#fff;padding:2px 8px;border-radius:10px;font-weight:700;font-size:11px;white-space:nowrap">${g}·${esc(tt(GRADE_META[g].label))}</span>`;
@@ -743,7 +750,7 @@ function copySummary(){
   const tlines = [cols.join('\t')];
   DATA.companies.forEach(c=>{
     const r = compute(c);
-    const cov = r.coverage==null?'—':r.coverage.toFixed(2)+'x';
+    const recTerm = '$'+(r.recDeposit/1000)+'k · '+weekLabel(r.recDays)+(r.termsMismatch?' ⚠':'');
     const flags = r.allFlags.length? r.allFlags.join('; '):T('none');
     const dep = '$'+(Number(c.deposit)||0).toLocaleString('en-US');
     html += '<tr>'+
@@ -751,14 +758,14 @@ function copySummary(){
       td(esc(tt(c.country)),'white-space:nowrap')+
       td(dep,'text-align:right;white-space:nowrap')+
       td(Number(c.settlementDays)>0?esc(c.settlementDays+(LANG==='en'?'d':'일')+' · '+c.currency):'—','text-align:center;white-space:nowrap')+
-      td(cov,'text-align:center;white-space:nowrap')+
+      td(recTerm,'text-align:center;white-space:nowrap;'+(r.termsMismatch?'color:#c47f00;font-weight:600':''))+
       td(r.weighted.toFixed(1),'text-align:right')+
       td(badgeC(r.scoreGrade),'text-align:center')+
       td(badgeC(r.finalGrade),'text-align:center')+
       td(esc(flags),'color:#b23b3b')+
       td('<b>'+esc(c.scores[13])+'/5</b> '+esc(tt(c.notes.comment)||''),'min-width:260px;color:#54637a')+
       '</tr>';
-    tlines.push([tt(c.name)+' ('+c.id+')', tt(c.country), dep, (Number(c.settlementDays)>0?c.settlementDays+(LANG==='en'?'d':'일')+' · '+c.currency:'—'), cov, r.weighted.toFixed(1), r.scoreGrade,
+    tlines.push([tt(c.name)+' ('+c.id+')', tt(c.country), dep, (Number(c.settlementDays)>0?c.settlementDays+(LANG==='en'?'d':'일')+' · '+c.currency:'—'), recTerm, r.weighted.toFixed(1), r.scoreGrade,
       r.finalGrade+'-'+tt(GRADE_META[r.finalGrade].label), flags, '('+c.scores[13]+'/5) '+(tt(c.notes.comment)||'')].map(clean).join('\t'));
   });
   html += '</tbody></table>';
