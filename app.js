@@ -75,7 +75,7 @@ const GRADE_META = {
   C:{label:B('추가 확인 필요','Needs further review'), cls:'g-C'}, D:{label:B('보류','On hold'), cls:'g-D'}, E:{label:B('거절 추천','Reject (recommended)'), cls:'g-E'}
 };
 const RANK = {A:0,B:1,C:2,D:3,E:4};
-const STORE_KEY = 'omh_prg_v27';
+const STORE_KEY = 'omh_prg_v28';
 const UNVERIFIED_RE = /확인필요|unverified|tbc|to be confirmed/i;
 
 /* def label/opts helpers */
@@ -373,16 +373,16 @@ function render(){
 
 /* ---------- dashboard ---------- */
 function viewDashboard(){
-  const list = DATA.companies.map(c=>({c, r:compute(c)}));
-  const count = g => list.filter(x=>x.r.finalGrade===g).length;
+  const all = DATA.companies.map(c=>({c, r:compute(c)}));
+  const completed = all.filter(x=>x.c.status==='approved' && !x.c.benchmark);
+  const list = all.filter(x=>!(x.c.status==='approved' && !x.c.benchmark));
   const approve = list.filter(x=>['A','B'].includes(x.r.finalGrade)).length;
   const hold = list.filter(x=>['C','D'].includes(x.r.finalGrade)).length;
-  const reject = count('E');
   const cards = `<div class="cards">
-    <div class="card"><div class="k">${T('cardTotal')}</div><div class="v">${list.length}</div></div>
-    <div class="card"><div class="k">${T('cardApprove')}</div><div class="v" style="color:var(--gA)">${approve}</div></div>
+    <div class="card"><div class="k">${LANG==='en'?'In review':'평가 진행'}</div><div class="v">${list.length}</div></div>
+    <div class="card"><div class="k">${LANG==='en'?'Approved (done)':'승인 완료'}</div><div class="v" style="color:var(--gA)">${completed.length}</div></div>
+    <div class="card"><div class="k">${T('cardApprove')}</div><div class="v" style="color:var(--gB)">${approve}</div></div>
     <div class="card"><div class="k">${T('cardHold')}</div><div class="v" style="color:var(--gD)">${hold}</div></div>
-    <div class="card"><div class="k">${T('cardReject')}</div><div class="v" style="color:var(--gE)">${reject}</div></div>
   </div>
   <p class="hint" style="margin:-10px 0 18px">${T('dashHint')}</p>`;
   const rows = list.map(({c,r})=>`
@@ -404,8 +404,19 @@ function viewDashboard(){
       <th class="num">${T('thWeighted')}</th><th class="ctr">${T('thScoreGrade')}<br><span class="hint" style="font-weight:400">${T('thScoreGradeSub')}</span></th><th class="ctr">${T('thFinal')}<br><span class="hint" style="font-weight:400">${T('thFinalSub')}</span></th><th>${T('thFlags')}</th><th>${T('thComment')}<br><span class="hint" style="font-weight:400">${T('thCommentSub')}</span></th>
     </tr></thead><tbody>${rows}</tbody></table></div></div>`
     : `<div class="panel"><div class="empty">${T('noCompanies')}</div></div>`;
+  const compRows = completed.map(({c,r})=>`
+    <tr data-open="${c.id}">
+      <td><b>${esc(tt(c.name)||T('blank'))}</b><div class="hint">${esc(c.id)} · ${esc(tt(c.businessType)||'-')}</div></td>
+      <td class="ctr">${esc(tt(c.country)||'-')}</td>
+      <td class="num">${fmtUSD(c.deposit)}</td>
+      <td class="ctr">${Number(c.settlementDays)>0?esc(c.settlementDays)+T('dayUnit')+' · '+esc(c.currency):'—'}</td>
+      <td class="ctr">${badge(r.finalGrade)}</td>
+      <td><div class="comment-cell">${esc(tt(c.notes.comment)||'-')}</div></td>
+    </tr>`).join('');
+  const completedPanel = completed.length ? `<div class="panel" style="border-color:#c6ebd3"><h3 style="background:#eaf7ef">✅ ${LANG==='en'?'Approved / Completed (CEO final approval)':'승인 완료 (대표이사 최종 승인)'} <span class="pill">${completed.length}</span></h3>
+    <div class="table-wrap"><table><thead><tr><th>${T('thCompany')}</th><th class="ctr">${T('thCountry')}</th><th class="num">${T('thDeposit')}</th><th class="ctr">${T('thSettle')}</th><th class="ctr">${T('thFinal')}</th><th>${LANG==='en'?'Note':'비고'}</th></tr></thead><tbody>${compRows}</tbody></table></div></div>` : '';
   const guide = `<div class="panel"><h3>${T('guideTitle')}</h3><div class="body" style="color:#54637a;font-size:13px;line-height:1.9">${T('guideBody')}</div></div>`;
-  return cards + table + guide;
+  return cards + table + completedPanel + guide;
 }
 
 /* ---------- companies list ---------- */
@@ -884,7 +895,7 @@ function seed(){
       {stage:'scm',reviewer:B('SCM팀','SCM team'),decision:'proceed',comment:B('엔드유저·인벤토리 적정','End-users·inventory appropriate'),date:'2026-06-27'},
       {stage:'finance',reviewer:B('재무팀','Finance team'),decision:'proceed',comment:B('커버율 1.07x, GMV 한도 조건','Coverage 1.07x, GMV cap condition'),date:'2026-06-29'},
       {stage:'ceo',reviewer:B('대표이사','CEO'),decision:'approve',comment:B('대표이사 컨펌 완료·진행 확정 (초기 3개월 GMV 한도·모니터링 조건)','CEO confirmed·go decision (initial 3-month GMV cap·monitoring conditions)'),date:'2026-07-06'}] });
-  const c5 = mk({ id:'C005', name:B('Ohmyhotel (오마이호텔앤코) · 자체평가','Ohmyhotel (Oh My Hotel & Co) · self-assessment'), country:B('싱가포르 본사(한·일·베 법인)','Singapore HQ (KR·JP·VN entities)'), businessType:'B2B/B2C/SaaS',
+  const c5 = mk({ id:'C005', benchmark:true, name:B('Ohmyhotel (오마이호텔앤코) · 자체평가','Ohmyhotel (Oh My Hotel & Co) · self-assessment'), country:B('싱가포르 본사(한·일·베 법인)','Singapore HQ (KR·JP·VN entities)'), businessType:'B2B/B2C/SaaS',
     market:B('아시아(한·일·베·태)+글로벌','Asia (KR·JP·VN·TH) + global'), customerType:B('B2B 파트너 + B2C(ohmyhotel.com) 엔드유저','B2B partners + B2C (ohmyhotel.com) end-users'),
     website:'ohmyhotel.com / ohmyhotel.biz', bizRegNo:B('주식회사 오마이호텔앤코 (2012 설립 · DART/나이스 조회)','Oh My Hotel & Co., Ltd. (est. 2012 · DART/NICE lookup)'), foundedYear:2012, representative:B('이미순 대표(前 Vicotrip)','CEO Misoon Lee (ex-Vicotrip)'),
     contact:'Global OPs', email:'Global_OPs@ohmyhotel.com', deposit:0, settlementDays:0, currency:'KRW', creditRequired:'N', monthlyGMV:0, salesRegion:B('아시아·글로벌','Asia·global'), products:B('일·베·태·한 호텔 3,700+ 직계약','3,700+ direct-contract hotels (JP·VN·TH·KR)'), apiIntegration:'Y', manualBooking:'N', cancelNoshowRisk:'low',
