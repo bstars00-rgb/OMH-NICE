@@ -75,7 +75,7 @@ const GRADE_META = {
   C:{label:B('추가 확인 필요','Needs further review'), cls:'g-C'}, D:{label:B('보류','On hold'), cls:'g-D'}, E:{label:B('거절 추천','Reject (recommended)'), cls:'g-E'}
 };
 const RANK = {A:0,B:1,C:2,D:3,E:4};
-const STORE_KEY = 'omh_prg_v30';
+const STORE_KEY = 'omh_prg_v31';
 const UNVERIFIED_RE = /확인필요|unverified|tbc|to be confirmed/i;
 
 /* def label/opts helpers */
@@ -256,6 +256,7 @@ function blankCompany(){
     website:'', bizRegNo:'', foundedYear:'', representative:'', contact:'', email:'', status:'new',
     deposit:0, settlementDays:14, currency:'USD', creditRequired:'N', monthlyGMV:0,
     salesRegion:'', products:'', apiIntegration:'Y', manualBooking:'N', cancelNoshowRisk:'medium',
+    roomTypeCode:'', ratePlanCode:'',
     docs:Object.fromEntries(DOC_KEYS.map(k=>[k,'notSubmitted'])),
     public:Object.fromEntries(PUBLIC_KEYS.map(k=>[k,'unknown'])),
     scores:new Array(ITEM_NAMES.length).fill(3),
@@ -270,6 +271,8 @@ function normalizeCompany(c){
   if(!Array.isArray(c.scores)) c.scores=[];
   while(c.scores.length < ITEM_NAMES.length) c.scores.push(3);
   if(c.scores.length > ITEM_NAMES.length) c.scores = c.scores.slice(0, ITEM_NAMES.length);
+  if(c.roomTypeCode==null) c.roomTypeCode='';
+  if(c.ratePlanCode==null) c.ratePlanCode='';
   c.notes = c.notes || {};
   ['expect','check','opinion','comment'].forEach(function(k){ if(!(k in c.notes)) c.notes[k]=''; });
   c.documents = c.documents || [];
@@ -397,11 +400,13 @@ function viewDashboard(){
       <td class="ctr">${badge(r.finalGrade)}</td>
       <td><div class="flaglist">${r.allFlags.length? r.allFlags.map(f=>`<span class="flag">${esc(f)}</span>`).join('') : `<span class="flag ok">${T('none')}</span>`}</div></td>
       <td><div class="comment-cell"><span class="cscore">${esc(c.scores[13])}/5</span> ${esc(tt(c.notes.comment)||'-')}</div></td>
+      <td class="ctr" style="white-space:nowrap">${esc(c.roomTypeCode)||'-'}</td>
+      <td class="ctr" style="white-space:nowrap">${esc(c.ratePlanCode)||'-'}</td>
     </tr>`).join('');
   const table = list.length ? `<div class="panel"><h3 style="display:flex;align-items:center;justify-content:space-between;gap:12px">${T('summaryTitle')} <button class="btn sm" data-act="copysummary">${T('copyFormatted')}</button></h3>
     <div class="table-wrap"><table><thead><tr>
       <th>${T('thCompany')}</th><th class="ctr">${T('thCountry')}</th><th class="num">${T('thDeposit')}</th><th class="ctr">${T('thSettle')}</th><th class="ctr">${LANG==='en'?'Rec. terms':'권장조건'}<br><span class="hint" style="font-weight:400">${LANG==='en'?'by score':'점수기반'}</span></th>
-      <th class="num">${T('thWeighted')}</th><th class="ctr">${T('thScoreGrade')}<br><span class="hint" style="font-weight:400">${T('thScoreGradeSub')}</span></th><th class="ctr">${T('thFinal')}<br><span class="hint" style="font-weight:400">${T('thFinalSub')}</span></th><th>${T('thFlags')}</th><th>${T('thComment')}<br><span class="hint" style="font-weight:400">${T('thCommentSub')}</span></th>
+      <th class="num">${T('thWeighted')}</th><th class="ctr">${T('thScoreGrade')}<br><span class="hint" style="font-weight:400">${T('thScoreGradeSub')}</span></th><th class="ctr">${T('thFinal')}<br><span class="hint" style="font-weight:400">${T('thFinalSub')}</span></th><th>${T('thFlags')}</th><th>${T('thComment')}<br><span class="hint" style="font-weight:400">${T('thCommentSub')}</span></th><th class="ctr">${LANG==='en'?'Room type code':'룸타입코드'}</th><th class="ctr">${LANG==='en'?'Rate plan code':'레이트플랜코드'}</th>
     </tr></thead><tbody>${rows}</tbody></table></div></div>`
     : `<div class="panel"><div class="empty">${T('noCompanies')}</div></div>`;
   const compRows = completed.map(({c,r})=>`
@@ -521,6 +526,8 @@ function tabDeal(c){
     ${selDefs(T('fApi'),'apiIntegration',c.apiIntegration,YNP_DEFS)}
     ${selDefs(T('fManual'),'manualBooking',c.manualBooking,MANUAL_DEFS)}
     ${selDefs(T('fCancelRisk'),'cancelNoshowRisk',c.cancelNoshowRisk,RISK_DEFS)}
+    ${fld(LANG==='en'?'Room type code':'룸타입코드','roomTypeCode',c.roomTypeCode)}
+    ${fld(LANG==='en'?'Rate plan code':'레이트플랜코드','ratePlanCode',c.ratePlanCode)}
   </div>
   <div class="result" style="margin-top:18px">
     <div class="box"><div class="k">${LANG==='en'?'Recommended deposit':'권장 Deposit'} <span class="hint">(${LANG==='en'?'score':'점수'} ${r.weighted.toFixed(1)})</span></div><div class="v">${fmtUSD(r.recDeposit)}</div><div class="hint">${LANG==='en'?'Current':'현재'} ${fmtUSD(c.deposit)}</div></div>
@@ -752,8 +759,8 @@ function fallbackRich(html, text, okMsg){
 function copySummary(){
   const clean = s => String(s==null?'':s).replace(/[\t\r\n]+/g,' ').trim();
   const cols = LANG==='en'
-    ? ['Company','Country','Deposit(USD)','Settlement','Rec. terms','Weighted score','Score grade','Final verdict','Red flags','Reviewer comment(score)']
-    : ['업체','국가','Deposit(USD)','정산주기','권장조건','가중점수','점수등급','최종판정','레드플래그','담당자 코멘트(점수)'];
+    ? ['Company','Country','Deposit(USD)','Settlement','Rec. terms','Weighted score','Score grade','Final verdict','Red flags','Reviewer comment(score)','Room type code','Rate plan code']
+    : ['업체','국가','Deposit(USD)','정산주기','권장조건','가중점수','점수등급','최종판정','레드플래그','담당자 코멘트(점수)','룸타입코드','레이트플랜코드'];
   const th = c => `<th style="border:1px solid #b9c2d0;padding:7px 10px;background:#1F4E78;color:#fff;text-align:left;white-space:nowrap">${c}</th>`;
   const td = (c,extra) => `<td style="border:1px solid #d6dce6;padding:6px 10px;vertical-align:top;${extra||''}">${c}</td>`;
   const badgeC = g => `<span style="display:inline-block;background:${gradeColor(g)};color:#fff;padding:2px 8px;border-radius:10px;font-weight:700;font-size:11px;white-space:nowrap">${g}·${esc(tt(GRADE_META[g].label))}</span>`;
@@ -775,9 +782,11 @@ function copySummary(){
       td(badgeC(r.finalGrade),'text-align:center')+
       td(esc(flags),'color:#b23b3b')+
       td('<b>'+esc(c.scores[13])+'/5</b> '+esc(tt(c.notes.comment)||''),'min-width:260px;color:#54637a')+
+      td(esc(c.roomTypeCode)||'-','text-align:center;white-space:nowrap')+
+      td(esc(c.ratePlanCode)||'-','text-align:center;white-space:nowrap')+
       '</tr>';
     tlines.push([tt(c.name)+' ('+c.id+')', tt(c.country), dep, (Number(c.settlementDays)>0?c.settlementDays+(LANG==='en'?'d':'일')+' · '+c.currency:'—'), recTerm, r.weighted.toFixed(1), r.scoreGrade,
-      r.finalGrade+'-'+tt(GRADE_META[r.finalGrade].label), flags, '('+c.scores[13]+'/5) '+(tt(c.notes.comment)||'')].map(clean).join('\t'));
+      r.finalGrade+'-'+tt(GRADE_META[r.finalGrade].label), flags, '('+c.scores[13]+'/5) '+(tt(c.notes.comment)||''), (c.roomTypeCode||'-'), (c.ratePlanCode||'-')].map(clean).join('\t'));
   });
   html += '</tbody></table>';
   const okMsg = LANG==='en'
