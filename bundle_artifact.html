@@ -626,7 +626,7 @@ function viewDashboard(){
       <td class="ctr" style="white-space:nowrap;${r.termsMismatch?'color:var(--gC);font-weight:600':''}">$${r.recDeposit/1000}k · ${weekLabel(r.recDays)}${r.termsMismatch?' ⚠':''}</td>
       <td class="num">${r.weighted.toFixed(1)}</td>
       <td class="ctr">${badge(r.scoreGrade)}</td>
-      <td class="ctr">${badge(r.finalGrade)}</td>
+      <td class="ctr">${badge(r.finalGrade)}<div style="margin-top:5px"><span class="status-chip">${esc(defLabel(STATUS_DEFS,c.status)||'-')}</span></div></td>
       <td><div class="flaglist">${r.allFlags.length? r.allFlags.map(f=>`<span class="flag">${esc(f)}</span>`).join('') : `<span class="flag ok">${T('none')}</span>`}</div></td>
       <td><div class="comment-cell"><span class="cscore">${esc(c.scores[13])}/5</span> ${esc(tt(c.notes.comment)||'-')}</div></td>
       <td class="ctr" style="white-space:nowrap">${esc(c.roomTypeCode)||'-'}</td>
