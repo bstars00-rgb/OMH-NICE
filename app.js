@@ -75,7 +75,7 @@ const GRADE_META = {
   C:{label:B('추가 확인 필요','Needs further review'), cls:'g-C'}, D:{label:B('보류','On hold'), cls:'g-D'}, E:{label:B('거절 추천','Reject (recommended)'), cls:'g-E'}
 };
 const RANK = {A:0,B:1,C:2,D:3,E:4};
-const STORE_KEY = 'omh_prg_v39';
+const STORE_KEY = 'omh_prg_v40';
 const UNVERIFIED_RE = /확인필요|unverified|tbc|to be confirmed/i;
 
 /* def label/opts helpers */
@@ -848,7 +848,7 @@ function seed(){
     market:B('중국 아웃바운드','China outbound'), customerType:B('라이브커머스(샤오홍슈·더우인)·OTA·여행사 + B2C sub-agent','Live-commerce (Xiaohongshu·Douyin)·OTA·agencies + B2C sub-agents'),
     website:'huamaoly@163.com (B2B platform)', bizRegNo:'73809897-000-02-26-8 (HK BR) / 海南华茂 2019', foundedYear:2019, representative:B('법인 등기 확인(대표자 성명 자료 추가 요청)','Entity registration confirmed (representative full name pending)'),
     contact:'Huamao', email:'huamaoly@163.com', deposit:10000, settlementDays:7, monthlyGMV:50000, salesRegion:B('일본·한국·베트남·글로벌','Japan·Korea·Vietnam·global'), products:B('일본·한국·베트남·글로벌 호텔','Japan·Korea·Vietnam·global hotels'),
-    scores:[4,5,5,5,4,4,4,3,2,4,3,3,4,4], status:'review',
+    scores:[4,5,5,5,4,4,4,3,2,4,3,3,4,4], status:'approved',
     docs:{bizLicense:'submitted',profile:'submitted',bank:'notSubmitted',contract:'notSubmitted',settleAgree:'submitted',refs:'submitted',financials:'notSubmitted',repId:'notSubmitted'},
     public:{website:'Y',linkedin:'unknown',google:'Y',negNews:'N',lawsuit:'N',tradeRefs:'Y',domainAge:'unknown',addrExists:'Y',repHistory:'Y'},
     documents:[{name:B('사업자등록증(홍콩 BR)','Business license (HK BR)'),file:'huamao_business license 1.pdf'},{name:B('회사소개서(15p)','Company profile (15p)'),file:'Huamao introduction file 1.pdf'}],
@@ -864,7 +864,7 @@ function seed(){
     market:B('유럽·일본·태국','Europe·Japan·Thailand'), customerType:B('B2B 여행사(대표 개발자 출신·24/7 CS)','B2B agencies (developer-founder·24/7 CS)'),
     website:'http://linkalltravel.com', bizRegNo:'70069113 (HK BR · FUNTRIP HONGKONG LIMITED)', foundedYear:2019, representative:B('확인 완료(대표: 개발자 출신)','Confirmed (founder: ex-developer)'),
     deposit:10000, monthlyGMV:30000, salesRegion:B('유럽·일본·태국','Europe·Japan·Thailand'), products:B('글로벌 호텔(Expedia·Hotelbeds·WebBeds)','Global hotels (Expedia·Hotelbeds·WebBeds)'),
-    scores:[4,4,3,3,2,2,5,3,2,5,4,3,5,5],
+    scores:[4,4,3,3,2,2,5,3,2,5,4,3,5,5], status:'approved',
     docs:{bizLicense:'submitted',profile:'submitted',bank:'submitted',contract:'submitted',settleAgree:'submitted',refs:'submitted',financials:'notSubmitted',repId:'submitted'},
     notes:{expect:B('홍콩법인 FUNTRIP HONGKONG LIMITED(BR 70069113, 퀸즈로드센트럴 145-149) 실체 확인, 웹사이트 linkalltravel.com. 최근 연 TTV 9억 HKD(~1.15억 USD) 대규모 거래. 대표 개발자 출신(연동 2~3일), 일 5,000~6,000건 예약(일본 ~30%), 24/7 CS.',"HK entity FUNTRIP HONGKONG LIMITED (BR 70069113, 145-149 Queen's Road Central) verified; website linkalltravel.com. Recent annual TTV HKD 900M (~USD 115M), large scale. Developer-founder (2-3 day integration), 5,000-6,000 bookings/day (~30% Japan), 24/7 CS."),
       check:B('공급사가 Expedia·Hotelbeds·WebBeds 등 대형 애그리게이터 중심 → 유니크 인벤토리·기존 채널 중복도 확인 필요. 감사 재무제표 미제출(TTV 9억 HKD는 자기신고). Deposit 커버율 0.71x 부족.','Supply is aggregator-heavy (Expedia·Hotelbeds·WebBeds) → check unique inventory and overlap with existing channels. Audited financials not submitted (HKD 900M TTV is self-reported). Deposit coverage 0.71x — short.'),
@@ -936,7 +936,7 @@ function seed(){
     market:B('한국 국내 B2C(제주 예약)','Korea domestic B2C (Jeju booking)'), customerType:B('한국 여행자(B2C 엔드유저)','Korean travelers (B2C end users)'),
     website:B('www.dolharupang.com','www.dolharupang.com'), bizRegNo:B('사업자등록증 제출·확인(주식회사 제주페이)','Business license submitted·verified (Jeju Pay Inc.)'), foundedYear:2012, representative:B('사업자등록증 상 대표자 확인','Representative per business license'),
     contact:'Global Sales', email:'', deposit:30000, settlementDays:14, currency:'KRW', creditRequired:'N', monthlyGMV:0, salesRegion:B('한국(KR)','Korea (KR)'), products:B('제주 항공권·렌트카·숙소·여행티켓 통합 B2C','Jeju air·car·hotel·ticket integrated B2C'), apiIntegration:'Y', manualBooking:'N', cancelNoshowRisk:'low',
-    scores:[4,4,5,4,4,3,4,3,4,4,4,4,4,4], status:'review',
+    scores:[4,4,5,4,4,3,4,3,4,4,4,4,4,4], status:'approved',
     docs:{bizLicense:'submitted',profile:'submitted',bank:'notSubmitted',contract:'notSubmitted',settleAgree:'notSubmitted',refs:'submitted',financials:'notSubmitted',repId:'notSubmitted'},
     public:{website:'Y',linkedin:'unknown',google:'Y',negNews:'N',lawsuit:'N',tradeRefs:'unknown',domainAge:'unknown',addrExists:'Y',repHistory:'unknown'},
     documents:[{name:B('사업자등록증(주식회사 제주페이)','Business license (Jeju Pay Inc.)'),file:'제주페이_사업자등록증_25.09.10 (5).pdf'},{name:B('회사소개서(2025)','Company profile (2025)'),file:'2025_회사소개서.pdf'}],
@@ -964,7 +964,7 @@ function seed(){
     market:B('중국 기업·정부(정무) 차旅(비즈니스 트래블)','China corporate·government business travel'), customerType:B('국유기업·상장사·정부(24개 성급 인대) 기업고객','SOEs·listed firms·government (24 provincial congress groups)'),
     website:B('www.zirugroup.cn','www.zirugroup.cn'), bizRegNo:B('913201136673802326 (梓如商务旅행服务集团股份 · 2007 · 자본 8,705만 CNY)','913201136673802326 (Ziru Group Co.,Ltd · 2007 · capital CNY 87.05M)'), foundedYear:2007, representative:B('廖任熙 (Liao Renxi), 법정대표인','Liao Renxi (廖任熙), legal representative'),
     contact:'Ziru TMC', email:'', deposit:10000, settlementDays:14, currency:'USD', creditRequired:'N', monthlyGMV:0, salesRegion:B('중국 국내+해외 差旅','China domestic + overseas business travel'), products:B('차旅 TMC(항공·호텔·기차·용차)·ChatBI — OMH 호텔(한국·해외) 유통 대상','Business-travel TMC (air·hotel·rail·car)·ChatBI — distributes OMH hotels (Korea·overseas)'), apiIntegration:'Y', manualBooking:'N', cancelNoshowRisk:'low',
-    scores:[5,5,5,4,4,3,3,4,4,5,4,4,5,4], status:'review',
+    scores:[5,5,5,4,4,3,3,4,4,5,4,4,5,4], status:'approved',
     docs:{bizLicense:'submitted',profile:'submitted',bank:'notSubmitted',contract:'notSubmitted',settleAgree:'notSubmitted',refs:'submitted',financials:'notSubmitted',repId:'notSubmitted'},
     public:{website:'Y',linkedin:'unknown',google:'Y',negNews:'N',lawsuit:'N',tradeRefs:'Y',domainAge:'unknown',addrExists:'Y',repHistory:'unknown'},
     documents:[{name:B('사업자등록증(梓如 Ziru Group)','Business license (Ziru Group)'),file:'Business License of Ziru Group Co., Ltd..pdf'},{name:B('회사소개서 중영판(差旅 솔루션)','Company profile CN/EN'),file:'Ziru Business Travel Solution JZ Edition V2.pdf'},{name:B('一站式 差旅 솔루션(중문)','One-stop travel solution (CN)'),file:'梓如商旅一站式差旅解决方案.pdf'}],
@@ -977,7 +977,7 @@ function seed(){
     market:B('중국 기업 差旅(해외 호텔 포함)','China corporate business travel (incl. overseas hotels)'), customerType:B('중국 기업(대규모 Didi Enterprise 고객)','Chinese enterprises (large Didi Enterprise base)'),
     website:B('滴滴企业版 (Didi Enterprise Solutions)','DiDi Enterprise Solutions'), bizRegNo:B('91120116MA82669937 (北京小桔国际旅행社 天津分公司 · 2023.5.25)','91120116MA82669937 (Beijing Xiaoju Intl Travel, Tianjin Branch · 2023-05-25)'), foundedYear:2023, representative:B('郭起超 (분공사 负责人)','Guo Qichao (branch head)'),
     contact:'Didi Enterprise', email:'', deposit:10000, settlementDays:14, currency:'USD', creditRequired:'N', monthlyGMV:0, salesRegion:B('중국 기업 해외 差旅(한국·글로벌)','China corporate overseas travel (Korea·global)'), products:B('기업 差旅 TMC — 해외 호텔·항공·용차·VCC 결제 — OMH 호텔(한국·아시아) 유통 대상','Corporate-travel TMC — overseas hotel·air·car·VCC pay — distributes OMH hotels (Korea·Asia)'), apiIntegration:'Y', manualBooking:'N', cancelNoshowRisk:'low',
-    scores:[4,5,5,4,3,3,4,3,4,5,4,3,4,4], status:'review',
+    scores:[4,5,5,4,3,3,4,3,4,5,4,3,4,4], status:'approved',
     docs:{bizLicense:'submitted',profile:'submitted',bank:'notSubmitted',contract:'notSubmitted',settleAgree:'notSubmitted',refs:'submitted',financials:'notSubmitted',repId:'notSubmitted'},
     public:{website:'Y',linkedin:'unknown',google:'Y',negNews:'N',lawsuit:'N',tradeRefs:'Y',domainAge:'unknown',addrExists:'Y',repHistory:'unknown'},
     documents:[{name:B('해외 호텔 자원 설명(滴滴企业版)','Overseas hotel resources (DiDi Enterprise)'),file:'滴滴企业版：海外酒店资源说明_to客户.pptx'}],
@@ -990,7 +990,7 @@ function seed(){
     market:B('러시아 아웃바운드 B2C(패키지 여행)','Russia outbound B2C (package holidays)'), customerType:B('러시아 소비자(B2C 엔드유저)','Russian consumers (B2C end users)'),
     website:B('travelata.ru','travelata.ru'), bizRegNo:B('운영 Travel Technology LLC(2011, RU) · 계약 Vivatech Platform L.L.C-FZ(UAE Meydan FZ, License 2643677.01, TRN 105369350100001)','Operator Travel Technology LLC (2011, RU) · Contract Vivatech Platform L.L.C-FZ (UAE Meydan FZ, License 2643677.01)'), foundedYear:2011, representative:B('Alexey Zaretsky (Vivatech 이사·100% 주주, 이스라엘 국적)','Alexey Zaretsky (Vivatech director·100% shareholder, Israeli)'),
     contact:'Travelata', email:'', deposit:20000, settlementDays:14, currency:'USD', creditRequired:'Y', monthlyGMV:0, salesRegion:B('베트남·태국·한국·싱가포르(러시아 소스)','Vietnam·Thailand·Korea·Singapore (Russian source)'), products:B('베트남(1순위)·태국·한국·싱가포르 호텔(패키지)','Vietnam(1st)·Thailand·Korea·Singapore hotels (packages)'), apiIntegration:'Y', manualBooking:'N', cancelNoshowRisk:'medium',
-    scores:[4,4,4,4,4,2,3,4,3,4,3,4,3,4], status:'review',
+    scores:[4,4,4,4,4,2,3,4,3,4,3,4,3,4], status:'approved',
     docs:{bizLicense:'submitted',profile:'submitted',bank:'submitted',contract:'notSubmitted',settleAgree:'notSubmitted',refs:'submitted',financials:'notSubmitted',repId:'notSubmitted'},
     public:{website:'Y',linkedin:'unknown',google:'Y',negNews:'N',lawsuit:'N',tradeRefs:'unknown',domainAge:'unknown',addrExists:'Y',repHistory:'unknown'},
     documents:[{name:B('UAE 사업자등록증(Vivatech Platform, Meydan FZ)','UAE Trade License (Vivatech Platform, Meydan FZ)'),file:'Business_License_-_New_176842410638.pdf'},{name:B('회사소개서(Vivatech Platform)','Company profile (Vivatech Platform)'),file:'COMPANY PROFILE_карточка компании_Vivatech Platform L.L.C-FZ (002).docx'},{name:B('지분등록부(Share Register)','Share Register'),file:'Share_Register_MFZ_176842410710.pdf'}],
