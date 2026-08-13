@@ -304,7 +304,7 @@ const GRADE_META = {
   C:{label:B('추가 확인 필요','Needs further review'), cls:'g-C'}, D:{label:B('보류','On hold'), cls:'g-D'}, E:{label:B('거절 추천','Reject (recommended)'), cls:'g-E'}
 };
 const RANK = {A:0,B:1,C:2,D:3,E:4};
-const STORE_KEY = 'omh_prg_v38';
+const STORE_KEY = 'omh_prg_v39';
 const UNVERIFIED_RE = /확인필요|unverified|tbc|to be confirmed/i;
 
 /* def label/opts helpers */
@@ -1237,7 +1237,7 @@ function seed(){
     market:B('글로벌 호텔 도매·B2B 유통(Travel Tech)','Global hotel wholesale·B2B distribution (Travel Tech)'), customerType:B('여행사·TMC·OTA(100+)·서브에이전트','Travel agencies·TMCs·OTAs (100+)·sub-agents'),
     website:'http://www.m-tu.com', bizRegNo:B('湖南萌兔旅游科技有限公司 (2014, 창사) · 자본금 200만 CNY · 법정대표 张沽风','Hunan Mengtu Travel Technology Co., Ltd. (2014, Changsha)·Capital CNY 2M·Legal rep Zhang Gufeng'), foundedYear:2014, representative:B('张沽风 (법정대표)','Zhang Gufeng (legal rep)'),
     contact:'Mengtu Travel', email:'', deposit:0, settlementDays:14, currency:'USD', creditRequired:'Y', creditApproved:'Y', monthlyGMV:0, salesRegion:B('일본·한국·대만·홍콩·태국','Japan·Korea·Taiwan·Hong Kong·Thailand'), products:B('글로벌 호텔 60만+·직계약 3만+','600k+ global hotels·30k+ direct contracts'), apiIntegration:'Y', manualBooking:'N', cancelNoshowRisk:'medium',
-    scores:[4,4,4,3,3,3,4,2,1,4,3,3,4,4], status:'conditional',
+    scores:[4,4,4,3,3,3,4,2,1,4,3,3,4,4], status:'approved',
     docs:{bizLicense:'submitted',profile:'submitted',bank:'notSubmitted',contract:'notSubmitted',settleAgree:'notSubmitted',refs:'notSubmitted',financials:'notSubmitted',repId:'notSubmitted'},
     public:{website:'Y',linkedin:'unknown',google:'Y',negNews:'N',lawsuit:'N',tradeRefs:'unknown',domainAge:'unknown',addrExists:'Y',repHistory:'unknown'},
     documents:[{name:B('사업자등록증(营业执照, 湖南萌兔)','Business license (营业执照, Hunan Mengtu)'),file:'湖南萌兔旅游科技有限公司 Hunan Mengtu Travel Technology Co., Ltd..pdf'},{name:B('회사소개서(25p)','Company profile (25p)'),file:'Mengtu Travel Profile.pdf'}],
