@@ -75,7 +75,7 @@ const GRADE_META = {
   C:{label:B('추가 확인 필요','Needs further review'), cls:'g-C'}, D:{label:B('보류','On hold'), cls:'g-D'}, E:{label:B('거절 추천','Reject (recommended)'), cls:'g-E'}
 };
 const RANK = {A:0,B:1,C:2,D:3,E:4};
-const STORE_KEY = 'omh_prg_v36';
+const STORE_KEY = 'omh_prg_v37';
 const UNVERIFIED_RE = /확인필요|unverified|tbc|to be confirmed/i;
 
 /* def label/opts helpers */
@@ -1004,7 +1004,21 @@ function seed(){
       {stage:'finance',reviewer:'Global OPs',decision:'proceed',comment:B('신용 1:4→1:2 축소(무담보 노출 $30k→$10k) 반영 → 점수 상향. 남은 핵심 관건은 Vivatech↔Travelata 보증(recourse).','Credit reduced 1:4→1:2 (uncovered $30k→$10k) → score up. Key remaining item is the Vivatech↔Travelata guarantee (recourse).'),date:'2026-07-17'},
       {stage:'sales',reviewer:'Bryant',decision:'proceed',comment:B('거래조건 최종 합의: Deposit $20,000·신용 1:2(한도 $40,000)·격주(결제 3~5일)·USD. Deposit는 통합 착수 시 Pavel 송금. 공급계약 승인 요청(승인 시 계약서 발송→서명→기술 설문).','Final terms agreed: Deposit $20,000·credit 1:2 ($40,000 limit)·biweekly (3-5 day)·USD. Deposit wired by Pavel near integration. Requesting supplier-agreement approval (on approval: send contract→sign→tech questionnaire).'),date:'2026-07-17'},
       {stage:'ceo',reviewer:'대표',decision:'conditional',comment:B('핵심 관건이던 Vivatech↔Travelata 보증(recourse) 해결 — 별도 보증 대신 UAE 사업자등록증(Vivatech Trade License)을 계약·recourse 근거로 수용. 68.4 C → 조건부 승인(B).','Key blocker (Vivatech↔Travelata recourse) resolved — instead of a separate guarantee, the UAE Trade License (Vivatech) is accepted as the contracting·recourse basis. 68.4 C → conditional approval (B).'),date:'2026-07-17'}] });
-  return [c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11];
+  const c12 = mk({ id:'C012', name:B('Mengtu Travel (湖南萌兔)','Mengtu Travel (Hunan Mengtu)'), country:B('중국(창사)','China (Changsha)'), businessType:'B2B',
+    market:B('글로벌 호텔 도매·B2B 유통(Travel Tech)','Global hotel wholesale·B2B distribution (Travel Tech)'), customerType:B('여행사·TMC·OTA(100+)·서브에이전트','Travel agencies·TMCs·OTAs (100+)·sub-agents'),
+    website:'http://www.m-tu.com', bizRegNo:B('湖南萌兔旅游科技有限公司 (2014, 창사) · 자본금 200만 CNY · 법정대표 张沽风','Hunan Mengtu Travel Technology Co., Ltd. (2014, Changsha)·Capital CNY 2M·Legal rep Zhang Gufeng'), foundedYear:2014, representative:B('张沽风 (법정대표)','Zhang Gufeng (legal rep)'),
+    contact:'Mengtu Travel', email:'', deposit:0, settlementDays:14, currency:'USD', creditRequired:'Y', monthlyGMV:0, salesRegion:B('일본·한국·대만·홍콩·태국','Japan·Korea·Taiwan·Hong Kong·Thailand'), products:B('글로벌 호텔 60만+·직계약 3만+','600k+ global hotels·30k+ direct contracts'), apiIntegration:'Y', manualBooking:'N', cancelNoshowRisk:'medium',
+    scores:[4,4,4,3,3,3,4,2,1,4,3,3,4,3], status:'review',
+    docs:{bizLicense:'submitted',profile:'submitted',bank:'notSubmitted',contract:'notSubmitted',settleAgree:'notSubmitted',refs:'notSubmitted',financials:'notSubmitted',repId:'notSubmitted'},
+    public:{website:'Y',linkedin:'unknown',google:'Y',negNews:'N',lawsuit:'N',tradeRefs:'unknown',domainAge:'unknown',addrExists:'Y',repHistory:'unknown'},
+    documents:[{name:B('사업자등록증(营业执照, 湖南萌兔)','Business license (营业执照, Hunan Mengtu)'),file:'湖南萌兔旅游科技有限公司 Hunan Mengtu Travel Technology Co., Ltd..pdf'},{name:B('회사소개서(25p)','Company profile (25p)'),file:'Mengtu Travel Profile.pdf'}],
+    notes:{expect:B('중국 창사 소재 B2B 글로벌 호텔 도매·유통사 Mengtu(湖南萌兔, 2014). 60만+ 호텔·3만+ 직계약, 자체 IT팀·API 실시간 재고·즉시확정. 100+ 여행사·TMC·OTA 연결. 일본 일 600~800건 예약, 평균 3박. 소스마켓 중국 40%·글로벌 60%(유럽/미국). Top 목적지 JP·KR·TW·HK·TH → OMH 아시아 호텔의 신규 중화권/글로벌 수요 채널. 2016 매출 1.4억 CNY.','B2B global hotel wholesaler/distributor Mengtu (Hunan Mengtu, 2014, Changsha). 600k+ hotels·30k+ direct contracts, in-house IT·API real-time inventory·instant confirmation. Connected to 100+ agencies·TMCs·OTAs. Japan 600-800 bookings/day, avg 3 nights. Source market China 40%·global 60% (Europe/USA). Top JP·KR·TW·HK·TH → new Greater-China/global demand channel for OMH Asia hotels. 2016 revenue CNY 140M.'),
+      check:B('★거래조건 요청: no deposit·USD·격주(후불). Deposit 0 상태의 후불 = 무담보 신용 노출 → 레드플래그(D 캡). 업력 11년·구체적 일 예약량(JP 600~800/day, 평균 3박)은 실사업을 시사하나, 제출 재무는 2016년 기준(구), 은행정보·계약서·최신 재무·대표 신분확인 미제출, 자본금 200만 CNY(~$28k) 소규모. 정책상 <70점 구간 권장 Deposit $30k/1주 대비 큰 간극.','★Requested terms: no deposit·USD·biweekly (postpay). Postpay with zero deposit = uncovered credit exposure → red flag (D cap). 11-yr history·concrete daily volume (JP 600-800/day, avg 3 nights) suggest real operations, but submitted financials are from 2016 (old); bank details·contract·recent financials·rep ID not submitted; capital CNY 2M (~$28k) is small. Large gap vs policy (<70 band recommends $30k deposit·1wk).'),
+      opinion:B('실사업 정황(60만 호텔·3만 직계약·JP 600~800/day)은 긍정적이나, Deposit 0 + 격주 후불은 무담보 신용 노출로 D 캡(레드플래그). 조건: ①Deposit 예치(정책 권장 $30k·1주) 또는 선입금(prepaid)로 무담보 노출 제거 ②최신 재무·은행정보·계약서·대표 신분확인 ③초기 소액 파일럿·낮은 한도. 조건 충족 시 재평가.','Real-operation signals (600k hotels·30k direct·JP 600-800/day) are positive, but zero deposit + biweekly postpay = uncovered credit → D cap (red flag). Conditions: (1) post deposit (policy $30k·1wk) or switch to prepaid to remove uncovered exposure, (2) recent financials·bank details·contract·rep ID, (3) small initial pilot·low limit. Re-assess once met.'),
+      comment:B('회사 실체·볼륨은 준수하나 no deposit·격주 후불 요청이 무담보 신용 노출 → D(레드플래그). Deposit 예치 또는 선입금 전환·최신 재무 검증이 선결(3/5).','Entity·volume are decent, but the no-deposit·biweekly postpay ask creates uncovered credit → D (red flag). Posting a deposit or switching to prepaid·verifying recent financials are prerequisites (3/5).')},
+    history:[{stage:'sales',reviewer:'Global Sales',decision:'proceed',comment:B('신규 B2B 호텔 도매 파트너 후보 Mengtu(湖南萌兔, 2014, 창사). 60만 호텔·3만 직계약·JP 600~800/day·평균 3박. 요청조건 no deposit·USD·격주.','New B2B hotel-wholesale partner candidate Mengtu (Hunan Mengtu, 2014, Changsha). 600k hotels·30k direct·JP 600-800/day·avg 3 nights. Requested terms: no deposit·USD·biweekly.'),date:'2026-08-13'},
+      {stage:'finance',reviewer:'Global OPs',decision:'hold',comment:B('no deposit + 격주 후불 = 무담보 신용 노출(레드플래그) → Deposit 예치 또는 선입금 필요. 재무는 2016년 기준·은행/계약서 미제출. 정책 권장 $30k·1주 대비 간극.','No deposit + biweekly postpay = uncovered credit (red flag) → require a deposit or prepaid. Financials are from 2016; bank/contract not submitted. Gap vs policy $30k·1wk.'),date:'2026-08-13'}] });
+  return [c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12];
 }
 
 /* ---------- 사용 매뉴얼 ---------- */
