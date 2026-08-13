@@ -304,7 +304,7 @@ const GRADE_META = {
   C:{label:B('추가 확인 필요','Needs further review'), cls:'g-C'}, D:{label:B('보류','On hold'), cls:'g-D'}, E:{label:B('거절 추천','Reject (recommended)'), cls:'g-E'}
 };
 const RANK = {A:0,B:1,C:2,D:3,E:4};
-const STORE_KEY = 'omh_prg_v35';
+const STORE_KEY = 'omh_prg_v36';
 const UNVERIFIED_RE = /확인필요|unverified|tbc|to be confirmed/i;
 
 /* def label/opts helpers */
@@ -1103,7 +1103,7 @@ function seed(){
   const c3 = mk({ id:'C003', name:'Wingpulse (WINGSPULSE TECH)', country:B('중국(홍콩·선전 거점)','China (HK·Shenzhen bases)'), businessType:'B2B/TMC',
     market:B('호텔 직계약+LCC 항공 (Travel Tech)','Hotel direct-contract + LCC air (Travel Tech)'), customerType:B('B2B·TMC·서브에이전트(OTA는 Elong·Qunar)','B2B·TMC·sub-agent (OTA: Elong·Qunar)'),
     website:'http://wingspulse.com / info@wingspulse.com', bizRegNo:'51588485 (HK BR)', foundedYear:2025, representative:B('HE PENG(贺鹏), 단독이사','HE PENG (贺鹏), sole director'),
-    contact:'WingsPulse', email:'info@wingspulse.com', deposit:10000, monthlyGMV:40000, salesRegion:B('한국·동남아·중국(HK·대만·마카오)','Korea·SE Asia·China (HK·Taiwan·Macau)'), products:B('한국 등 역내 호텔 260+ 직계약 · LCC 항공 15+사','Korea+regional 260+ direct hotels · 15+ LCC airlines'),
+    contact:'WingsPulse', email:'info@wingspulse.com', deposit:20000, monthlyGMV:40000, salesRegion:B('한국·동남아·중국(HK·대만·마카오)','Korea·SE Asia·China (HK·Taiwan·Macau)'), products:B('한국 등 역내 호텔 260+ 직계약 · LCC 항공 15+사','Korea+regional 260+ direct hotels · 15+ LCC airlines'),
     scores:[3,4,4,4,3,4,4,3,3,4,3,3,4,4], status:'review',
     docs:{bizLicense:'submitted',profile:'submitted',bank:'notSubmitted',contract:'notSubmitted',settleAgree:'submitted',refs:'submitted',financials:'submitted',repId:'submitted'},
     public:{website:'Y',linkedin:'unknown',google:'Y',negNews:'N',lawsuit:'N',tradeRefs:'Y',domainAge:'unknown',addrExists:'Y',repHistory:'Y'},
@@ -1117,7 +1117,8 @@ function seed(){
       {stage:'scm',reviewer:'Global OPs',decision:'proceed',comment:B('추가정보(260+ 직계약·DMC 협력) 반영해 상향, 단 감사상 무영업과 상충 → 실거래 증빙 조건 추가확인','Raised on added info (260+ direct contracts·DMC partners); conflicts with inactive audit → conditional, needs live-transaction proof'),date:'2026-07-03'},
       {stage:'finance',reviewer:'Global OPs',decision:'proceed',comment:B('정산조건 2주(14일)·USD 정산 합의 완료','Settlement terms agreed: 2 weeks (14 days)·USD'),date:'2026-07-08'},
       {stage:'sales',reviewer:'Global OPs',decision:'proceed',comment:B('대표자 신분확인 서류 제출 완료','Representative ID verification submitted'),date:'2026-07-14'},
-      {stage:'scm',reviewer:'Global OPs',decision:'proceed',comment:B('업체 업데이트 반영: 일 생산 JP10·KR15·VN12 RN, 15+ LCC(Ryanair 등), 260 직계약, 당사 인벤토리 우선구매 의향 → C→B(조건부). 실거래 증빙(은행내역·예약데이터)로 감사 무영업 상충 해소 조건.','Update: daily RN JP10·KR15·VN12, 15+ LCC (Ryanair etc.), 260 direct contracts, intent to buy our inventory first → C→B (conditional). Condition: verify real transactions (bank·booking data) to resolve the inactive-audit conflict.'),date:'2026-07-14'}] });
+      {stage:'scm',reviewer:'Global OPs',decision:'proceed',comment:B('업체 업데이트 반영: 일 생산 JP10·KR15·VN12 RN, 15+ LCC(Ryanair 등), 260 직계약, 당사 인벤토리 우선구매 의향 → C→B(조건부). 실거래 증빙(은행내역·예약데이터)로 감사 무영업 상충 해소 조건.','Update: daily RN JP10·KR15·VN12, 15+ LCC (Ryanair etc.), 260 direct contracts, intent to buy our inventory first → C→B (conditional). Condition: verify real transactions (bank·booking data) to resolve the inactive-audit conflict.'),date:'2026-07-14'},
+      {stage:'finance',reviewer:'Global OPs',decision:'conditional',comment:B('거래조건 합의: Deposit $10,000→$20,000·2주(14일)·USD. 점수 70.4(B)라 정책 권장 디포짓은 $30,000 → $20,000은 $10k 미달분에 대해 대표 예외 승인 필요.','Terms agreed: Deposit $10,000→$20,000·biweekly (14d)·USD. Score 70.4 (B), so policy-recommended deposit is $30,000 → $20,000 is $10k short and needs CEO exception approval.'),date:'2026-08-13'}] });
   // Happy Travel (C004): CEO approval completed (2026-07-06) — retained per the full-record-retention policy
   const c4 = mk({ id:'C004', name:'Happy Travel', country:B('두바이(UAE)','Dubai (UAE)'), businessType:'B2B/TMC',
     market:B('중동','Middle East'), customerType:B('중동 기업/여행사(태국 호텔 수요)','Middle East corporates/agencies (Thailand hotel demand)'),
