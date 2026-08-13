@@ -633,7 +633,7 @@ function viewDashboard(){
       <td class="ctr" style="white-space:nowrap">${esc(c.roomTypeCode)||'-'}</td>
       <td class="ctr" style="white-space:nowrap">${esc(c.ratePlanCode)||'-'}</td>
     </tr>`).join('');
-  const table = list.length ? `<div class="panel"><h3 style="display:flex;align-items:center;justify-content:space-between;gap:12px">${T('summaryTitle')} <button class="btn sm" data-act="copysummary">${T('copyFormatted')}</button></h3>
+  const table = list.length ? `<div class="panel"><h3 style="display:flex;align-items:center;justify-content:space-between;gap:12px">${T('summaryTitle')} <button class="btn sm" data-act="copysummary:active">${T('copyFormatted')}</button></h3>
     <div class="table-wrap"><table><thead><tr>
       <th>${T('thCompany')}</th><th class="ctr">${T('thCountry')}</th><th class="num">${T('thDeposit')}</th><th class="ctr">${T('thSettle')}</th><th class="ctr">${LANG==='en'?'Rec. terms':'권장조건'}<br><span class="hint" style="font-weight:400">${LANG==='en'?'by score':'점수기반'}</span></th>
       <th class="num">${T('thWeighted')}</th><th class="ctr">${T('thScoreGrade')}<br><span class="hint" style="font-weight:400">${T('thScoreGradeSub')}</span></th><th class="ctr">${T('thFinal')}<br><span class="hint" style="font-weight:400">${T('thFinalSub')}</span></th><th>${T('thFlags')}</th><th>${T('thComment')}<br><span class="hint" style="font-weight:400">${T('thCommentSub')}</span></th><th class="ctr">${LANG==='en'?'Room type code':'룸타입코드'}</th><th class="ctr">${LANG==='en'?'Rate plan code':'레이트플랜코드'}</th>
@@ -648,7 +648,7 @@ function viewDashboard(){
       <td class="ctr">${badge(r.finalGrade)}</td>
       <td><div class="comment-cell">${esc(tt(c.notes.comment)||'-')}</div></td>
     </tr>`).join('');
-  const completedPanel = completed.length ? `<div class="panel" style="border-color:#c6ebd3"><h3 style="background:#eaf7ef">✅ ${LANG==='en'?'Approved / Completed (CEO final approval)':'승인 완료 (대표이사 최종 승인)'} <span class="pill">${completed.length}</span></h3>
+  const completedPanel = completed.length ? `<div class="panel" style="border-color:#c6ebd3"><h3 style="background:#eaf7ef;display:flex;align-items:center;justify-content:space-between;gap:12px"><span>✅ ${LANG==='en'?'Approved / Completed (CEO final approval)':'승인 완료 (대표이사 최종 승인)'} <span class="pill">${completed.length}</span></span> <button class="btn sm" data-act="copysummary:completed">${T('copyFormatted')}</button></h3>
     <div class="table-wrap"><table><thead><tr><th>${T('thCompany')}</th><th class="ctr">${T('thCountry')}</th><th class="num">${T('thDeposit')}</th><th class="ctr">${T('thSettle')}</th><th class="ctr">${T('thFinal')}</th><th>${LANG==='en'?'Note':'비고'}</th></tr></thead><tbody>${compRows}</tbody></table></div></div>` : '';
   const benchRows = benchmark.map(({c,r})=>`
     <tr data-open="${c.id}">
@@ -660,7 +660,7 @@ function viewDashboard(){
       <td class="ctr">${badge(r.finalGrade)}</td>
       <td><div class="comment-cell">${esc(tt(c.notes.comment)||'-')}</div></td>
     </tr>`).join('');
-  const benchmarkPanel = benchmark.length ? `<div class="panel" style="border-color:#d5deea"><h3 style="background:#f4f7fb">🏛️ ${LANG==='en'?'Reference — self-assessment (benchmark, not a trading partner)':'참고용 — 자체평가(벤치마크 · 거래 대상 아님)'} <span class="pill">${benchmark.length}</span></h3>
+  const benchmarkPanel = benchmark.length ? `<div class="panel" style="border-color:#d5deea"><h3 style="background:#f4f7fb;display:flex;align-items:center;justify-content:space-between;gap:12px"><span>🏛️ ${LANG==='en'?'Reference — self-assessment (benchmark, not a trading partner)':'참고용 — 자체평가(벤치마크 · 거래 대상 아님)'} <span class="pill">${benchmark.length}</span></span> <button class="btn sm" data-act="copysummary:benchmark">${T('copyFormatted')}</button></h3>
     <div class="table-wrap"><table><thead><tr><th>${T('thCompany')}</th><th class="ctr">${T('thCountry')}</th><th class="num">${T('thDeposit')}</th><th class="ctr">${T('thSettle')}</th><th class="num">${T('thWeighted')}</th><th class="ctr">${T('thFinal')}</th><th>${LANG==='en'?'Note':'비고'}</th></tr></thead><tbody>${benchRows}</tbody></table></div></div>` : '';
   const guide = `<div class="panel"><h3>${T('guideTitle')}</h3><div class="body" style="color:#54637a;font-size:13px;line-height:1.9">${T('guideBody')}</div></div>`;
   return cards + table + completedPanel + benchmarkPanel + guide;
@@ -907,7 +907,7 @@ function act(a){
   else if(a==='print'){ window.print(); }
   else if(a==='copyreport'){ copyReport(); }
   else if(a==='addhist'){ addHist(); }
-  else if(a==='copysummary'){ copySummary(); }
+  else if(a==='copysummary' || a.indexOf('copysummary:')===0){ copySummary(a.split(':')[1]||'active'); }
 }
 
 /* content-level delegation (inputs, tabs, row open) */
@@ -998,7 +998,19 @@ function fallbackRich(html, text, okMsg){
 }
 
 /* ---------- summary table copy (formatted HTML + TSV) ---------- */
-function copySummary(){
+function sectionCompanies(section){
+  const all = DATA.companies;
+  if(section==='completed') return all.filter(c=>c.status==='approved' && !c.benchmark);
+  if(section==='benchmark') return all.filter(c=>c.benchmark);
+  if(section==='active') return all.filter(c=>!c.benchmark && c.status!=='approved');
+  return all; // 'all' or undefined → 전체
+}
+function sectionLabel(section){
+  if(LANG==='en') return section==='completed'?'approved/completed':section==='benchmark'?'reference (self-assessment)':section==='active'?'in-review partner':'partner';
+  return section==='completed'?'승인 완료':section==='benchmark'?'참고용(자체평가)':section==='active'?'평가 진행 업체':'업체';
+}
+function copySummary(section){
+  const comps = sectionCompanies(section);
   const clean = s => String(s==null?'':s).replace(/[\t\r\n]+/g,' ').trim();
   const cols = LANG==='en'
     ? ['Company','Country','Deposit(USD)','Settlement','Rec. terms','Weighted score','Score grade','Final verdict','Red flags','Reviewer comment(score)','Room type code','Rate plan code']
@@ -1008,7 +1020,7 @@ function copySummary(){
   const badgeC = g => `<span style="display:inline-block;background:${gradeColor(g)};color:#fff;padding:2px 8px;border-radius:10px;font-weight:700;font-size:11px;white-space:nowrap">${g}·${esc(tt(GRADE_META[g].label))}</span>`;
   let html = `<table style="border-collapse:collapse;font-family:'Malgun Gothic',Arial,sans-serif;font-size:12px;color:#1e2632"><thead><tr>${cols.map(th).join('')}</tr></thead><tbody>`;
   const tlines = [cols.join('\t')];
-  DATA.companies.forEach(c=>{
+  comps.forEach(c=>{
     const r = compute(c);
     const recTerm = '$'+(r.recDeposit/1000)+'k · '+weekLabel(r.recDays)+(r.termsMismatch?' ⚠':'');
     const flags = r.allFlags.length? r.allFlags.join('; '):T('none');
@@ -1031,9 +1043,10 @@ function copySummary(){
       r.finalGrade+'-'+tt(GRADE_META[r.finalGrade].label), flags, '('+c.scores[13]+'/5) '+(tt(c.notes.comment)||''), (c.roomTypeCode||'-'), (c.ratePlanCode||'-')].map(clean).join('\t'));
   });
   html += '</tbody></table>';
+  if(!comps.length){ alert(LANG==='en'?'No rows to copy in this section.':'이 섹션에 복사할 항목이 없습니다.'); return; }
   const okMsg = LANG==='en'
-    ? (DATA.companies.length+' partner risk summaries copied with formatting. Paste into email · Word · Excel.')
-    : (DATA.companies.length+'개 업체 리스크 요약이 서식 포함으로 복사되었습니다. 메일·Word·Excel에 붙여넣기 하세요.');
+    ? (comps.length+' '+sectionLabel(section)+' risk summaries copied with formatting. Paste into email · Word · Excel.')
+    : ('['+sectionLabel(section)+'] '+comps.length+'개 업체 리스크 요약이 서식 포함으로 복사되었습니다. 메일·Word·Excel에 붙여넣기 하세요.');
   copyRich(html, tlines.join('\n'), okMsg);
 }
 
