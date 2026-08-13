@@ -75,7 +75,7 @@ const GRADE_META = {
   C:{label:B('추가 확인 필요','Needs further review'), cls:'g-C'}, D:{label:B('보류','On hold'), cls:'g-D'}, E:{label:B('거절 추천','Reject (recommended)'), cls:'g-E'}
 };
 const RANK = {A:0,B:1,C:2,D:3,E:4};
-const STORE_KEY = 'omh_prg_v40';
+const STORE_KEY = 'omh_prg_v41';
 const UNVERIFIED_RE = /확인필요|unverified|tbc|to be confirmed/i;
 
 /* def label/opts helpers */
@@ -377,8 +377,9 @@ function render(){
 /* ---------- dashboard ---------- */
 function viewDashboard(){
   const all = DATA.companies.map(c=>({c, r:compute(c)}));
+  const benchmark = all.filter(x=>x.c.benchmark);
   const completed = all.filter(x=>x.c.status==='approved' && !x.c.benchmark);
-  const list = all.filter(x=>!(x.c.status==='approved' && !x.c.benchmark));
+  const list = all.filter(x=>!x.c.benchmark && x.c.status!=='approved');
   const approve = list.filter(x=>['A','B'].includes(x.r.finalGrade)).length;
   const hold = list.filter(x=>['C','D'].includes(x.r.finalGrade)).length;
   const cards = `<div class="cards">
@@ -420,8 +421,20 @@ function viewDashboard(){
     </tr>`).join('');
   const completedPanel = completed.length ? `<div class="panel" style="border-color:#c6ebd3"><h3 style="background:#eaf7ef">✅ ${LANG==='en'?'Approved / Completed (CEO final approval)':'승인 완료 (대표이사 최종 승인)'} <span class="pill">${completed.length}</span></h3>
     <div class="table-wrap"><table><thead><tr><th>${T('thCompany')}</th><th class="ctr">${T('thCountry')}</th><th class="num">${T('thDeposit')}</th><th class="ctr">${T('thSettle')}</th><th class="ctr">${T('thFinal')}</th><th>${LANG==='en'?'Note':'비고'}</th></tr></thead><tbody>${compRows}</tbody></table></div></div>` : '';
+  const benchRows = benchmark.map(({c,r})=>`
+    <tr data-open="${c.id}">
+      <td><b>${esc(tt(c.name)||T('blank'))}</b><div class="hint">${esc(c.id)} · ${esc(tt(c.businessType)||'-')}</div></td>
+      <td class="ctr">${esc(tt(c.country)||'-')}</td>
+      <td class="num">${fmtUSD(c.deposit)}</td>
+      <td class="ctr">${Number(c.settlementDays)>0?esc(c.settlementDays)+T('dayUnit')+' · '+esc(c.currency):'—'}</td>
+      <td class="num">${r.weighted.toFixed(1)}</td>
+      <td class="ctr">${badge(r.finalGrade)}</td>
+      <td><div class="comment-cell">${esc(tt(c.notes.comment)||'-')}</div></td>
+    </tr>`).join('');
+  const benchmarkPanel = benchmark.length ? `<div class="panel" style="border-color:#d5deea"><h3 style="background:#f4f7fb">🏛️ ${LANG==='en'?'Reference — self-assessment (benchmark, not a trading partner)':'참고용 — 자체평가(벤치마크 · 거래 대상 아님)'} <span class="pill">${benchmark.length}</span></h3>
+    <div class="table-wrap"><table><thead><tr><th>${T('thCompany')}</th><th class="ctr">${T('thCountry')}</th><th class="num">${T('thDeposit')}</th><th class="ctr">${T('thSettle')}</th><th class="num">${T('thWeighted')}</th><th class="ctr">${T('thFinal')}</th><th>${LANG==='en'?'Note':'비고'}</th></tr></thead><tbody>${benchRows}</tbody></table></div></div>` : '';
   const guide = `<div class="panel"><h3>${T('guideTitle')}</h3><div class="body" style="color:#54637a;font-size:13px;line-height:1.9">${T('guideBody')}</div></div>`;
-  return cards + table + completedPanel + guide;
+  return cards + table + completedPanel + benchmarkPanel + guide;
 }
 
 /* ---------- companies list ---------- */
@@ -1007,18 +1020,17 @@ function seed(){
   const c12 = mk({ id:'C012', name:B('Mengtu Travel (湖南萌兔)','Mengtu Travel (Hunan Mengtu)'), country:B('중국(창사)','China (Changsha)'), businessType:'B2B',
     market:B('글로벌 호텔 도매·B2B 유통(Travel Tech)','Global hotel wholesale·B2B distribution (Travel Tech)'), customerType:B('여행사·TMC·OTA(100+)·서브에이전트','Travel agencies·TMCs·OTAs (100+)·sub-agents'),
     website:'http://www.m-tu.com', bizRegNo:B('湖南萌兔旅游科技有限公司 (2014, 창사) · 자본금 200만 CNY · 법정대표 张沽风','Hunan Mengtu Travel Technology Co., Ltd. (2014, Changsha)·Capital CNY 2M·Legal rep Zhang Gufeng'), foundedYear:2014, representative:B('张沽风 (법정대표)','Zhang Gufeng (legal rep)'),
-    contact:'Mengtu Travel', email:'', deposit:0, settlementDays:14, currency:'USD', creditRequired:'Y', creditApproved:'Y', monthlyGMV:0, salesRegion:B('일본·한국·대만·홍콩·태국','Japan·Korea·Taiwan·Hong Kong·Thailand'), products:B('글로벌 호텔 60만+·직계약 3만+','600k+ global hotels·30k+ direct contracts'), apiIntegration:'Y', manualBooking:'N', cancelNoshowRisk:'medium',
-    scores:[4,4,4,3,3,3,4,2,1,4,3,3,4,4], status:'approved',
+    contact:'Mengtu Travel', email:'', deposit:0, settlementDays:14, currency:'USD', creditRequired:'Y', monthlyGMV:0, salesRegion:B('일본·한국·대만·홍콩·태국','Japan·Korea·Taiwan·Hong Kong·Thailand'), products:B('글로벌 호텔 60만+·직계약 3만+','600k+ global hotels·30k+ direct contracts'), apiIntegration:'Y', manualBooking:'N', cancelNoshowRisk:'medium',
+    scores:[4,4,4,3,3,3,4,2,1,4,3,3,4,3], status:'review',
     docs:{bizLicense:'submitted',profile:'submitted',bank:'notSubmitted',contract:'notSubmitted',settleAgree:'notSubmitted',refs:'notSubmitted',financials:'notSubmitted',repId:'notSubmitted'},
     public:{website:'Y',linkedin:'unknown',google:'Y',negNews:'N',lawsuit:'N',tradeRefs:'unknown',domainAge:'unknown',addrExists:'Y',repHistory:'unknown'},
     documents:[{name:B('사업자등록증(营业执照, 湖南萌兔)','Business license (营业执照, Hunan Mengtu)'),file:'湖南萌兔旅游科技有限公司 Hunan Mengtu Travel Technology Co., Ltd..pdf'},{name:B('회사소개서(25p)','Company profile (25p)'),file:'Mengtu Travel Profile.pdf'}],
     notes:{expect:B('중국 창사 소재 B2B 글로벌 호텔 도매·유통사 Mengtu(湖南萌兔, 2014). 60만+ 호텔·3만+ 직계약, 자체 IT팀·API 실시간 재고·즉시확정. 100+ 여행사·TMC·OTA 연결. 일본 일 600~800건 예약, 평균 3박. 소스마켓 중국 40%·글로벌 60%(유럽/미국). Top 목적지 JP·KR·TW·HK·TH → OMH 아시아 호텔의 신규 중화권/글로벌 수요 채널. 2016 매출 1.4억 CNY.','B2B global hotel wholesaler/distributor Mengtu (Hunan Mengtu, 2014, Changsha). 600k+ hotels·30k+ direct contracts, in-house IT·API real-time inventory·instant confirmation. Connected to 100+ agencies·TMCs·OTAs. Japan 600-800 bookings/day, avg 3 nights. Source market China 40%·global 60% (Europe/USA). Top JP·KR·TW·HK·TH → new Greater-China/global demand channel for OMH Asia hotels. 2016 revenue CNY 140M.'),
-      check:B('★거래조건: no deposit·USD·격주(후불). Deposit 0 후불 = 무담보 신용 노출이나, 중국 OTA로서 ★대표님 무담보 진행 승인(2026-08-13) → 무담보 예외 수용. 업력 11년·구체적 일 예약량(JP 600~800/day, 평균 3박)이 실사업을 뒷받침. 다만 리스크 성격상 안전장치 필수: 초기 낮은 신용한도·건별/주간 모니터링·미결제 시 즉시 정지. 제출 재무는 2016년 기준(구)이라 최신 재무·은행정보·계약서·대표 신분확인은 후속 보완 권고.','★Terms: no deposit·USD·biweekly (postpay). Zero-deposit postpay = uncovered credit, but as a China OTA the ★CEO approved proceeding without deposit (2026-08-13) → exception accepted. 11-yr history·concrete daily volume (JP 600-800/day, avg 3 nights) back real operations. Given the risk nature, safeguards are essential: low initial credit limit·per-booking/weekly monitoring·immediate suspension on non-payment. Financials are from 2016 (old) → recent financials·bank details·contract·rep ID recommended as follow-up.'),
-      opinion:B('실사업 정황(60만 호텔·3만 직계약·JP 600~800/day) 긍정적. 무담보 신용 노출은 남으나 대표님 무담보 진행 승인(중국 OTA)으로 예외 수용 → 조건부 승인(B). 운영 조건: ①초기 낮은 신용한도·주간 모니터링·미결제 시 즉시 정지 ②소액 파일럿 후 단계적 한도 확대 ③최신 재무·은행정보·계약서·대표 신분확인 후속 보완.','Real-operation signals (600k hotels·30k direct·JP 600-800/day) are positive. Uncovered credit remains, but the CEO approved proceeding without deposit (China OTA) → exception accepted → conditional approval (B). Operating conditions: (1) low initial credit limit·weekly monitoring·immediate suspension on non-payment, (2) small pilot then staged limit increases, (3) follow up on recent financials·bank details·contract·rep ID.'),
-      comment:B('무담보 신용 노출은 리스크이나 대표님 무담보 진행 승인(중국 OTA)으로 예외 수용 → 조건부 승인. 초기 낮은 한도·모니터링·미결제 즉시 정지 전제(4/5).','Uncovered credit is a risk, but the CEO approved proceeding without deposit (China OTA) → exception accepted → conditional approval. Premised on low initial limit·monitoring·immediate suspension on non-payment (4/5).')},
+      check:B('★거래조건 요청: no deposit·USD·격주(후불). Deposit 0 상태의 후불 = 무담보 신용 노출 → 레드플래그(D 캡). 업력 11년·구체적 일 예약량(JP 600~800/day, 평균 3박)은 실사업을 시사하나, 제출 재무는 2016년 기준(구), 은행정보·계약서·최신 재무·대표 신분확인 미제출, 자본금 200만 CNY(~$28k) 소규모. 정책상 <70점 구간 권장 Deposit $30k/1주 대비 큰 간극. ★대표 승인 미확정.','★Requested terms: no deposit·USD·biweekly (postpay). Postpay with zero deposit = uncovered credit exposure → red flag (D cap). 11-yr history·concrete daily volume (JP 600-800/day, avg 3 nights) suggest real operations, but submitted financials are from 2016 (old); bank details·contract·recent financials·rep ID not submitted; capital CNY 2M (~$28k) is small. Large gap vs policy (<70 band recommends $30k deposit·1wk). ★CEO approval not yet granted.'),
+      opinion:B('실사업 정황(60만 호텔·3만 직계약·JP 600~800/day)은 긍정적이나, Deposit 0 + 격주 후불은 무담보 신용 노출로 D 캡(레드플래그). 조건: ①Deposit 예치(정책 권장 $30k·1주) 또는 선입금(prepaid)로 무담보 노출 제거, 또는 대표 무담보 예외 승인 ②최신 재무·은행정보·계약서·대표 신분확인 ③초기 소액 파일럿·낮은 한도. 조건 충족 시 재평가.','Real-operation signals (600k hotels·30k direct·JP 600-800/day) are positive, but zero deposit + biweekly postpay = uncovered credit → D cap (red flag). Conditions: (1) post deposit (policy $30k·1wk) or switch to prepaid to remove uncovered exposure, or a CEO no-deposit exception, (2) recent financials·bank details·contract·rep ID, (3) small initial pilot·low limit. Re-assess once met.'),
+      comment:B('회사 실체·볼륨은 준수하나 no deposit·격주 후불 요청이 무담보 신용 노출 → D(레드플래그). Deposit 예치·선입금 전환 또는 대표 무담보 예외 승인·최신 재무 검증이 선결(3/5).','Entity·volume are decent, but the no-deposit·biweekly postpay ask creates uncovered credit → D (red flag). Posting a deposit·switching to prepaid or a CEO no-deposit exception·verifying recent financials are prerequisites (3/5).')},
     history:[{stage:'sales',reviewer:'Global Sales',decision:'proceed',comment:B('신규 B2B 호텔 도매 파트너 후보 Mengtu(湖南萌兔, 2014, 창사). 60만 호텔·3만 직계약·JP 600~800/day·평균 3박. 요청조건 no deposit·USD·격주.','New B2B hotel-wholesale partner candidate Mengtu (Hunan Mengtu, 2014, Changsha). 600k hotels·30k direct·JP 600-800/day·avg 3 nights. Requested terms: no deposit·USD·biweekly.'),date:'2026-08-13'},
-      {stage:'finance',reviewer:'Global OPs',decision:'hold',comment:B('no deposit + 격주 후불 = 무담보 신용 노출(레드플래그) → Deposit 예치 또는 선입금 필요. 재무는 2016년 기준·은행/계약서 미제출. 정책 권장 $30k·1주 대비 간극.','No deposit + biweekly postpay = uncovered credit (red flag) → require a deposit or prepaid. Financials are from 2016; bank/contract not submitted. Gap vs policy $30k·1wk.'),date:'2026-08-13'},
-      {stage:'ceo',reviewer:'대표',decision:'conditional',comment:B('중국 OTA로 Deposit 없이 진행 승인 — 무담보 신용 노출 예외 수용. 전제: 초기 낮은 신용한도·주간 모니터링·미결제 시 즉시 정지, 최신 재무·은행정보·계약서 후속 보완. 62.0 C → 조건부 승인.','Approved to proceed as a China OTA without deposit — uncovered-credit exception accepted. Premise: low initial credit limit·weekly monitoring·immediate suspension on non-payment, follow up on recent financials·bank·contract. 62.0 C → conditional approval.'),date:'2026-08-13'}] });
+      {stage:'finance',reviewer:'Global OPs',decision:'hold',comment:B('no deposit + 격주 후불 = 무담보 신용 노출(레드플래그) → Deposit 예치·선입금 전환 또는 대표 무담보 예외 승인 필요. 재무는 2016년 기준·은행/계약서 미제출. 정책 권장 $30k·1주 대비 간극. 현재 대표 승인 미확정 → 보류.','No deposit + biweekly postpay = uncovered credit (red flag) → require a deposit·prepaid or a CEO no-deposit exception. Financials are from 2016; bank/contract not submitted. Gap vs policy $30k·1wk. CEO approval not yet granted → on hold.'),date:'2026-08-13'}] });
   return [c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12];
 }
 
