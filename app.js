@@ -75,7 +75,7 @@ const GRADE_META = {
   C:{label:B('추가 확인 필요','Needs further review'), cls:'g-C'}, D:{label:B('보류','On hold'), cls:'g-D'}, E:{label:B('거절 추천','Reject (recommended)'), cls:'g-E'}
 };
 const RANK = {A:0,B:1,C:2,D:3,E:4};
-const STORE_KEY = 'omh_prg_v43';
+const STORE_KEY = 'omh_prg_v44';
 const UNVERIFIED_RE = /확인필요|unverified|tbc|to be confirmed/i;
 
 /* def label/opts helpers */
@@ -907,7 +907,7 @@ function seed(){
     market:B('호텔 직계약+LCC 항공 (Travel Tech)','Hotel direct-contract + LCC air (Travel Tech)'), customerType:B('B2B·TMC·서브에이전트(OTA는 Elong·Qunar)','B2B·TMC·sub-agent (OTA: Elong·Qunar)'),
     website:'https://wingspulse.com/en/ · info@wingspulse.com', bizRegNo:'51588485 (HK BR) · 전신 Alfa Aggregators(LCC 데이터)', foundedYear:2025, representative:B('HE PENG(贺鹏), 단독이사','HE PENG (贺鹏), sole director'),
     contact:'WingsPulse', email:'info@wingspulse.com', deposit:20000, monthlyGMV:40000, salesRegion:B('한국·동남아·중국(HK·대만·마카오)','Korea·SE Asia·China (HK·Taiwan·Macau)'), products:B('연결(connectivity) 레이어 · 호텔 260+ 직계약/18 체인 · LCC/FSC 100+사(NDC)','Connectivity layer · 260+ direct hotels/18 chains · 100+ LCC/FSC airlines (NDC)'),
-    scores:[4,5,4,4,3,4,4,3,3,5,4,3,5,5], status:'review',
+    scores:[4,5,4,4,3,4,4,3,3,5,4,3,5,5], status:'approved',
     docs:{bizLicense:'submitted',profile:'submitted',bank:'notSubmitted',contract:'notSubmitted',settleAgree:'submitted',refs:'submitted',financials:'submitted',repId:'submitted'},
     public:{website:'Y',linkedin:'unknown',google:'Y',negNews:'N',lawsuit:'N',tradeRefs:'Y',domainAge:'unknown',addrExists:'Y',repHistory:'Y'},
     documents:[{name:B('사업자등록·감사 재무제표(17p)','Business license · audited financials (17p)'),file:'Business license wingpulse 1.pdf'},{name:B('회사소개서(영문)','Company profile (English)'),file:'Wing pulse intro-English 1.jpg'}],
@@ -923,7 +923,8 @@ function seed(){
       {stage:'scm',reviewer:'Global OPs',decision:'proceed',comment:B('업체 업데이트 반영: 일 생산 JP10·KR15·VN12 RN, 15+ LCC(Ryanair 등), 260 직계약, 당사 인벤토리 우선구매 의향 → C→B(조건부). 실거래 증빙(은행내역·예약데이터)로 감사 무영업 상충 해소 조건.','Update: daily RN JP10·KR15·VN12, 15+ LCC (Ryanair etc.), 260 direct contracts, intent to buy our inventory first → C→B (conditional). Condition: verify real transactions (bank·booking data) to resolve the inactive-audit conflict.'),date:'2026-07-14'},
       {stage:'scm',reviewer:'Aiden(Park Changbae)',decision:'proceed',comment:B('추가자료(wingspulse.com/en) 제출 — 연결 레이어(Fangcang 유사), 실시간 Live Search·Confirmation Request 동작, 100+ 항공(NDC)·18 호텔체인. 스타트업이나 3개월 내 전체 시스템 구축, 기술력 검토 요청.','Additional material (wingspulse.com/en) — connectivity layer (Fangcang-like), real-time Live Search·Confirmation Request working, 100+ airlines (NDC)·18 hotel chains. Startup but built full system in 3 months; requests tech-capability review.'),date:'2026-08-14'},
       {stage:'finance',reviewer:'Global OPs',decision:'proceed',comment:B('★기술력·운영가능성 재검토 통과 — 실시간 검색/확정·142ms·99.97%·NDC·웹훅·전신 Alfa(LCC 데이터) 이력. 스타트업 리스크 상당 완화 → 70.4 C→ 78.7 B. 남은 관건은 실거래 볼륨/재무 실체(초기 파일럿·3개월 모니터링). 대표 최종 승인 상신.','★Tech·operability re-review passed — real-time search/confirmation·142ms·99.97%·NDC·webhooks·Alfa (LCC data) lineage. Startup risk materially reduced → 70.4 C → 78.7 B. Remaining item is real volume/financials (initial pilot·3-month monitoring). Escalated for CEO final approval.'),date:'2026-08-14'},
-      {stage:'finance',reviewer:'Global OPs',decision:'conditional',comment:B('거래조건 합의: Deposit $10,000→$20,000·2주(14일)·USD. 점수 70.4(B)라 정책 권장 디포짓은 $30,000 → $20,000은 $10k 미달분에 대해 대표 예외 승인 필요.','Terms agreed: Deposit $10,000→$20,000·biweekly (14d)·USD. Score 70.4 (B), so policy-recommended deposit is $30,000 → $20,000 is $10k short and needs CEO exception approval.'),date:'2026-08-13'}] });
+      {stage:'finance',reviewer:'Global OPs',decision:'conditional',comment:B('거래조건 합의: Deposit $10,000→$20,000·2주(14일)·USD. 점수 70.4(B)라 정책 권장 디포짓은 $30,000 → $20,000은 $10k 미달분에 대해 대표 예외 승인 필요.','Terms agreed: Deposit $10,000→$20,000·biweekly (14d)·USD. Score 70.4 (B), so policy-recommended deposit is $30,000 → $20,000 is $10k short and needs CEO exception approval.'),date:'2026-08-13'},
+      {stage:'ceo',reviewer:'대표',decision:'approve',comment:B('대표 최종 승인 완료 — 78.7 B(조건부 승인). 전제: 초기 소액 파일럿·낮은 한도·3개월 모니터링으로 실거래 볼륨/재무 실체 확인.','CEO final approval granted — 78.7 B (conditional). Premise: small initial pilot·low limit·3-month monitoring to confirm real transaction volume/financials.'),date:'2026-11-17'}] });
   // Happy Travel (C004): CEO approval completed (2026-07-06) — retained per the full-record-retention policy
   const c4 = mk({ id:'C004', name:'Happy Travel', country:B('두바이(UAE)','Dubai (UAE)'), businessType:'B2B/TMC',
     market:B('중동','Middle East'), customerType:B('중동 기업/여행사(태국 호텔 수요)','Middle East corporates/agencies (Thailand hotel demand)'),
