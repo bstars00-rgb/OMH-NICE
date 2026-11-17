@@ -304,7 +304,7 @@ const GRADE_META = {
   C:{label:B('추가 확인 필요','Needs further review'), cls:'g-C'}, D:{label:B('보류','On hold'), cls:'g-D'}, E:{label:B('거절 추천','Reject (recommended)'), cls:'g-E'}
 };
 const RANK = {A:0,B:1,C:2,D:3,E:4};
-const STORE_KEY = 'omh_prg_v42';
+const STORE_KEY = 'omh_prg_v43';
 const UNVERIFIED_RE = /확인필요|unverified|tbc|to be confirmed/i;
 
 /* def label/opts helpers */
@@ -1281,7 +1281,21 @@ function seed(){
       comment:B('회사 실체·볼륨은 준수하나 no deposit·격주 후불 요청이 무담보 신용 노출 → D(레드플래그). Deposit 예치·선입금 전환 또는 대표 무담보 예외 승인·최신 재무 검증이 선결(3/5).','Entity·volume are decent, but the no-deposit·biweekly postpay ask creates uncovered credit → D (red flag). Posting a deposit·switching to prepaid or a CEO no-deposit exception·verifying recent financials are prerequisites (3/5).')},
     history:[{stage:'sales',reviewer:'Global Sales',decision:'proceed',comment:B('신규 B2B 호텔 도매 파트너 후보 Mengtu(湖南萌兔, 2014, 창사). 60만 호텔·3만 직계약·JP 600~800/day·평균 3박. 요청조건 no deposit·USD·격주.','New B2B hotel-wholesale partner candidate Mengtu (Hunan Mengtu, 2014, Changsha). 600k hotels·30k direct·JP 600-800/day·avg 3 nights. Requested terms: no deposit·USD·biweekly.'),date:'2026-08-13'},
       {stage:'finance',reviewer:'Global OPs',decision:'hold',comment:B('no deposit + 격주 후불 = 무담보 신용 노출(레드플래그) → Deposit 예치·선입금 전환 또는 대표 무담보 예외 승인 필요. 재무는 2016년 기준·은행/계약서 미제출. 정책 권장 $30k·1주 대비 간극. 현재 대표 승인 미확정 → 보류.','No deposit + biweekly postpay = uncovered credit (red flag) → require a deposit·prepaid or a CEO no-deposit exception. Financials are from 2016; bank/contract not submitted. Gap vs policy $30k·1wk. CEO approval not yet granted → on hold.'),date:'2026-08-13'}] });
-  return [c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12];
+  const c13 = mk({ id:'C013', name:B('BGTRIP (BIZITRIP)','BGTRIP (BIZITRIP)'), country:B('베트남(호치민)','Vietnam (HCMC)'), businessType:'B2B',
+    market:B('베트남 여행사 — 호텔 인벤토리 매입','Vietnam travel agency — hotel inventory buyer'), customerType:B('베트남 엔드유저(여행사 고객)','Vietnamese end-users (agency customers)'),
+    website:'https://www.bizitrip.vn', bizRegNo:B('BIZITRIP · 호치민 푸후안(Phu Nhuan) 소재 · 사업자등록증 미제출(2026-11-05 현장 미팅으로 실체 확인)','BIZITRIP · HCMC Phu Nhuan · business license not yet submitted (entity confirmed via on-site meeting 2026-11-05)'), foundedYear:'', representative:B('Ms. Nhi Hoang (운영 책임자) · Mr. Khoi Nguyen (COO)','Ms. Nhi Hoang (Head of Operations) · Mr. Khoi Nguyen (COO)'),
+    contact:'Nhi Hoang / Khoi Nguyen', email:'', deposit:10000, settlementDays:14, currency:'USD', creditRequired:'N', monthlyGMV:0, salesRegion:B('베트남','Vietnam'), products:B('OMH 아시아 호텔(당사 전용 매입)','OMH Asia hotels (buys from us only)'), apiIntegration:'Y', manualBooking:'N', cancelNoshowRisk:'medium',
+    scores:[3,4,4,3,5,3,3,3,3,3,4,3,4,4], status:'review',
+    docs:{bizLicense:'notSubmitted',profile:'notSubmitted',bank:'notSubmitted',contract:'notSubmitted',settleAgree:'submitted',refs:'notSubmitted',financials:'notSubmitted',repId:'notSubmitted'},
+    public:{website:'Y',linkedin:'unknown',google:'Y',negNews:'N',lawsuit:'N',tradeRefs:'unknown',domainAge:'unknown',addrExists:'Y',repHistory:'unknown'},
+    documents:[],
+    notes:{expect:B('베트남 호치민 소재 여행사 BGTRIP(BIZITRIP, bizitrip.vn). 2026-11-05 호치민 사무실(푸후안) 현장 미팅 — 운영 책임자 Nhi Hoang·COO Khoi Nguyen. 당사에서만 매입(교차판매 없음), 오픈 API 연동 희망. OMH 아시아 호텔의 신규 베트남 수요 채널. 거래조건 Deposit $10k·USD·격주(체크아웃일 기준) 합의, 기술팀 API 통합 착수 요청.','HCMC travel agency BGTRIP (BIZITRIP, bizitrip.vn). On-site meeting at their Phu Nhuan office 2026-11-05 — Head of Ops Nhi Hoang·COO Khoi Nguyen. Buys from us only (no cross-sell), wants open-API connection. New Vietnam demand channel for OMH Asia hotels. Terms agreed: Deposit $10k·USD·biweekly (by checkout date); requests API integration kickoff with our tech team.'),
+      check:B('현장 미팅(COO·운영책임자)과 웹사이트로 실체는 확인. 다만 사업자등록증·회사소개서·재무·은행정보·대표 신분확인 미제출 → 서류 보완 필요. 당사 전용 매입(교차판매 없음)이라 채널 중복·BRG 리스크 낮음. Deposit $10k·격주는 합의됨. 정책상 <70점 구간 권장 Deposit $30k/1주 대비 차이는 초기 소액 파일럿·모니터링으로 관리.','Entity confirmed via on-site meeting (COO·Head of Ops) and website. But business license·profile·financials·bank·rep ID not submitted → docs needed. Buys from us only (no cross-sell) → low channel-overlap·BRG risk. Deposit $10k·biweekly agreed. Gap vs policy ($30k/1wk for <70 band) managed via small initial pilot·monitoring.'),
+      opinion:B('실체·관계는 양호(현장 미팅·COO 접점·당사 전용 매입·Deposit 합의)하나 서류 미제출로 C(추가 확인). 조건: ①사업자등록증·회사소개서·은행정보 수령 ②초기 소액 파일럿·낮은 한도·3개월 모니터링 ③API 연동은 병행 착수 가능. 서류 보완 시 B 재평가 가능.','Entity·relationship are solid (on-site meeting·COO contact·buys-from-us-only·deposit agreed) but docs pending → C (needs check). Conditions: (1) obtain business license·profile·bank details, (2) small initial pilot·low limit·3-month monitoring, (3) API integration can start in parallel. Re-assess to B once docs are in.'),
+      comment:B('현장 미팅·COO 접점·당사 전용 매입·Deposit $10k 합의로 관계는 양호. 서류(사업자등록증·재무·은행) 수령이 선결 → 현재 C, 보완 시 B(4/5).','Relationship is solid — on-site meeting·COO contact·buys-from-us-only·$10k deposit agreed. Obtaining docs (license·financials·bank) is the prerequisite → C now, B once completed (4/5).')},
+    history:[{stage:'sales',reviewer:'Global Sales',decision:'proceed',comment:B('신규 파트너 BGTRIP(BIZITRIP, 호치민) — 2026-11-05 현장 미팅(Nhi Hoang·Khoi Nguyen COO). 당사 전용 매입·오픈 API 희망. Deposit $10k·USD·격주 합의, 기술팀 API 통합 착수 요청.','New partner BGTRIP (BIZITRIP, HCMC) — on-site meeting 2026-11-05 (Nhi Hoang·Khoi Nguyen COO). Buys from us only·wants open API. Deposit $10k·USD·biweekly agreed; requests API integration kickoff.'),date:'2026-11-05'},
+      {stage:'finance',reviewer:'Global OPs',decision:'proceed',comment:B('Deposit $10k·격주 합의 확인. 서류(사업자등록증·회사소개서·은행·재무) 미제출 → 수령 조건. 초기 소액 파일럿·3개월 모니터링 권고. 68.7 C.','Deposit $10k·biweekly confirmed. Docs (license·profile·bank·financials) pending → condition to obtain. Recommend small initial pilot·3-month monitoring. 68.7 C.'),date:'2026-11-17'}] });
+  return [c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13];
 }
 
 /* ---------- 사용 매뉴얼 ---------- */
